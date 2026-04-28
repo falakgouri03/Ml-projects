@@ -1,0 +1,12 @@
+services:
+  cardiosense-api:
+    build:
+      context: ./backend
+    container_name: cardiosense-api
+    ports:
+      - "8000:8000"
+    env_file:
+      - ./backend/.env
+    volumes:
+      - ./backend/model_artifacts:/app/model_artifacts
+      - ./backend/cardiosense.db:/app/cardiosense.db

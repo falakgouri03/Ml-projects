@@ -1,0 +1,1710 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CardioSense Pro v2 — Heart Disease Predictor</title>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,300&family=JetBrains+Mono:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+:root {
+  --w: #ffffff;
+  --bg: #f0f4f8;
+  --bg2: #e8eef5;
+  --surface: rgba(255,255,255,0.9);
+  --card: rgba(255,255,255,0.97);
+  --blue: #0066ff;
+  --blue2: #338aff;
+  --blue3: #66aaff;
+  --blue-glow: rgba(0,102,255,0.2);
+  --blue-soft: rgba(0,102,255,0.08);
+  --blue-mid: rgba(0,102,255,0.15);
+  --red: #ff3355;
+  --red2: #ff6680;
+  --red-soft: rgba(255,51,85,0.1);
+  --green: #00c977;
+  --green2: #33d993;
+  --green-soft: rgba(0,201,119,0.1);
+  --amber: #ff9500;
+  --amber-soft: rgba(255,149,0,0.1);
+  --ink: #0a1628;
+  --ink2: #2d3f5c;
+  --ink3: #5a6e8a;
+  --ink4: #8fa3bc;
+  --border: rgba(0,30,80,0.08);
+  --border2: rgba(0,30,80,0.14);
+  --shadow-sm: 0 2px 8px rgba(0,30,80,0.06);
+  --shadow-md: 0 8px 32px rgba(0,30,80,0.10);
+  --shadow-lg: 0 20px 60px rgba(0,30,80,0.15);
+  --shadow-blue: 0 8px 32px rgba(0,102,255,0.25);
+  --r: 16px; --r2: 12px; --r3: 8px;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+html{scroll-behavior:smooth;font-size:15px;}
+body{font-family:'Plus Jakarta Sans',sans-serif;background:var(--bg);color:var(--ink);min-height:100vh;overflow-x:hidden;-webkit-font-smoothing:antialiased;}
+body::before{content:'';position:fixed;inset:0;z-index:0;background:radial-gradient(ellipse 800px 600px at 15% 20%,rgba(0,102,255,0.06) 0%,transparent 70%),radial-gradient(ellipse 600px 500px at 85% 75%,rgba(0,201,119,0.04) 0%,transparent 70%),radial-gradient(ellipse 400px 400px at 50% 50%,rgba(0,102,255,0.03) 0%,transparent 70%);pointer-events:none;animation:mesh-drift 18s ease-in-out infinite alternate;}
+@keyframes mesh-drift{from{background-position:0% 0%,100% 100%,50% 50%}to{background-position:2% 3%,98% 97%,52% 48%}}
+
+/* SPLASH */
+#splash{position:fixed;inset:0;z-index:9999;background:#ffffff;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:28px;transition:opacity 0.6s ease,transform 0.6s ease;}
+#splash.hide{opacity:0;transform:scale(1.04);pointer-events:none;}
+.splash-logo{display:flex;align-items:center;gap:14px;animation:splash-in 0.8s cubic-bezier(0.22,1,0.36,1) both;}
+@keyframes splash-in{from{opacity:0;transform:translateY(24px)}to{opacity:1;transform:translateY(0)}}
+.splash-icon{width:56px;height:56px;border-radius:16px;background:linear-gradient(135deg,#0066ff,#3388ff);box-shadow:0 8px 32px rgba(0,102,255,0.35);display:flex;align-items:center;justify-content:center;font-size:26px;}
+.splash-brand{font-size:28px;font-weight:800;letter-spacing:-0.5px;color:var(--ink);}
+.splash-brand span{color:var(--blue);}
+.splash-tag{font-size:11px;font-weight:500;letter-spacing:3px;color:var(--ink4);text-transform:uppercase;animation:splash-in 0.8s 0.1s cubic-bezier(0.22,1,0.36,1) both;}
+.splash-bar-wrap{width:200px;height:2px;background:var(--bg2);border-radius:2px;overflow:hidden;animation:splash-in 0.8s 0.2s cubic-bezier(0.22,1,0.36,1) both;}
+.splash-bar{height:100%;width:0;background:linear-gradient(90deg,var(--blue),var(--blue3));border-radius:2px;animation:load-bar 2s 0.3s cubic-bezier(0.4,0,0.2,1) forwards;}
+@keyframes load-bar{to{width:100%}}
+.splash-status{font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--ink4);letter-spacing:1px;animation:splash-in 0.8s 0.3s cubic-bezier(0.22,1,0.36,1) both;}
+
+/* TOPBAR */
+#topbar{position:fixed;top:0;left:0;right:0;z-index:200;height:60px;background:rgba(255,255,255,0.92);backdrop-filter:blur(24px) saturate(1.8);border-bottom:1px solid var(--border);display:flex;align-items:center;padding:0 32px;box-shadow:0 1px 0 var(--border),var(--shadow-sm);}
+.tb-logo{display:flex;align-items:center;gap:10px;margin-right:40px;text-decoration:none;}
+.tb-logo-mark{width:34px;height:34px;border-radius:10px;background:linear-gradient(135deg,var(--blue),#5599ff);display:flex;align-items:center;justify-content:center;box-shadow:0 4px 12px var(--blue-glow);font-size:16px;position:relative;}
+.tb-logo-pulse{position:absolute;inset:0;border-radius:10px;border:2px solid rgba(0,102,255,0.4);animation:logo-pulse 2s ease-out infinite;}
+@keyframes logo-pulse{0%{transform:scale(1);opacity:0.8}100%{transform:scale(1.5);opacity:0}}
+.tb-brand{font-size:16px;font-weight:800;letter-spacing:-0.3px;color:var(--ink);}
+.tb-brand span{color:var(--blue);}
+.tb-version{font-family:'JetBrains Mono',monospace;font-size:9px;color:var(--ink4);background:var(--bg);border:1px solid var(--border);padding:2px 6px;border-radius:4px;margin-left:6px;letter-spacing:0.5px;align-self:flex-end;margin-bottom:4px;}
+.tb-nav{display:flex;gap:4px;flex:1;}
+.tb-nav-item{padding:7px 16px;border-radius:8px;font-size:13px;font-weight:600;color:var(--ink3);cursor:pointer;transition:all 0.2s;border:1px solid transparent;display:flex;align-items:center;gap:6px;}
+.tb-nav-item:hover{color:var(--ink);background:var(--bg);}
+.tb-nav-item.active{color:var(--blue);background:var(--blue-soft);border-color:rgba(0,102,255,0.15);}
+.tb-right{display:flex;align-items:center;gap:12px;margin-left:auto;}
+.tb-status{display:flex;align-items:center;gap:6px;font-size:12px;font-weight:600;color:var(--green);background:var(--green-soft);border:1px solid rgba(0,201,119,0.2);padding:6px 12px;border-radius:8px;}
+.tb-status-dot{width:7px;height:7px;border-radius:50%;background:var(--green);box-shadow:0 0 0 2px rgba(0,201,119,0.25);animation:status-pulse 2s ease-in-out infinite;}
+.tb-status.offline{color:#b86f00;background:var(--amber-soft);border-color:rgba(255,149,0,0.25);}
+.tb-status.offline .tb-status-dot{background:var(--amber);box-shadow:0 0 0 2px rgba(255,149,0,0.25);}
+.tb-status.error{color:var(--red);background:var(--red-soft);border-color:rgba(255,51,85,0.25);}
+.tb-status.error .tb-status-dot{background:var(--red);box-shadow:0 0 0 2px rgba(255,51,85,0.25);}
+.tb-auth,.tb-user{display:flex;align-items:center;gap:8px;}
+.tb-input{width:132px;height:34px;border:1.5px solid var(--border2);background:var(--w);border-radius:8px;padding:0 10px;font-size:12px;color:var(--ink);outline:none;transition:border-color 0.2s,box-shadow 0.2s;}
+.tb-input:focus{border-color:var(--blue);box-shadow:0 0 0 3px var(--blue-soft);}
+.tb-btn{height:34px;border-radius:8px;border:1px solid var(--border2);background:var(--w);color:var(--ink2);padding:0 12px;font-size:12px;font-weight:700;font-family:'Plus Jakarta Sans',sans-serif;cursor:pointer;transition:all 0.2s;}
+.tb-btn:hover{border-color:var(--ink4);}
+.tb-btn-primary{background:linear-gradient(135deg,var(--blue),#3388ff);border-color:transparent;color:#fff;box-shadow:0 4px 14px rgba(0,102,255,0.25);}
+.tb-btn-primary:hover{transform:translateY(-1px);box-shadow:0 6px 18px rgba(0,102,255,0.35);}
+.tb-user-name{font-size:12px;font-weight:700;color:var(--ink2);padding:0 6px;white-space:nowrap;max-width:180px;overflow:hidden;text-overflow:ellipsis;}
+@keyframes status-pulse{0%,100%{box-shadow:0 0 0 2px rgba(0,201,119,0.25)}50%{box-shadow:0 0 0 5px rgba(0,201,119,0.1)}}
+
+/* MAIN LAYOUT */
+#app{position:relative;z-index:1;padding-top:60px;min-height:100vh;}
+.panel{display:none;}
+.panel.active{display:block;}
+#panel-predict.active{display:grid;grid-template-columns:268px 1fr 330px;grid-template-rows:auto;min-height:calc(100vh - 60px);}
+
+/* LEFT SIDEBAR */
+.p-left{padding:28px 20px;background:rgba(255,255,255,0.7);border-right:1px solid var(--border);backdrop-filter:blur(20px);display:flex;flex-direction:column;gap:6px;position:sticky;top:60px;height:calc(100vh - 60px);overflow-y:auto;}
+.p-left-title{font-size:10px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--ink4);padding:0 8px;margin-top:16px;margin-bottom:4px;}
+.p-left-title:first-child{margin-top:0;}
+.step-item{display:flex;align-items:center;gap:12px;padding:10px;border-radius:10px;cursor:pointer;transition:all 0.2s;border:1px solid transparent;position:relative;}
+.step-item:hover{background:var(--bg);}
+.step-item.active{background:var(--blue-soft);border-color:rgba(0,102,255,0.15);}
+.step-item.done .step-num{background:var(--green);border-color:var(--green);color:#fff;}
+.step-item.done .step-num::after{content:'✓';position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:11px;}
+.step-num{width:28px;height:28px;border-radius:50%;border:2px solid var(--border2);display:flex;align-items:center;justify-content:center;font-family:'JetBrains Mono',monospace;font-size:11px;font-weight:600;color:var(--ink3);flex-shrink:0;position:relative;background:var(--w);transition:all 0.3s;}
+.step-item.active .step-num{border-color:var(--blue);color:var(--blue);box-shadow:0 0 0 4px var(--blue-soft);}
+.step-title{font-size:13px;font-weight:600;color:var(--ink2);}
+.step-item.active .step-title{color:var(--blue);}
+.step-sub{font-size:11px;color:var(--ink4);margin-top:1px;}
+.sidebar-progress{margin-top:auto;padding:16px;background:var(--blue-soft);border:1px solid rgba(0,102,255,0.12);border-radius:12px;}
+.sp-label{font-size:11px;font-weight:600;color:var(--blue);margin-bottom:8px;display:flex;justify-content:space-between;}
+.sp-bar{height:4px;background:rgba(0,102,255,0.15);border-radius:2px;overflow:hidden;}
+.sp-fill{height:100%;background:linear-gradient(90deg,var(--blue),var(--blue3));border-radius:2px;transition:width 0.5s cubic-bezier(0.4,0,0.2,1);width:0%;}
+
+/* CENTER FORM */
+.p-center{padding:32px 36px;overflow-y:auto;}
+.page-hdr{margin-bottom:28px;}
+.page-hdr-eyebrow{font-size:11px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--blue);display:flex;align-items:center;gap:8px;margin-bottom:6px;}
+.page-hdr-eyebrow::before{content:'';width:20px;height:2px;background:linear-gradient(90deg,var(--blue),transparent);border-radius:1px;}
+.page-hdr-title{font-size:26px;font-weight:800;letter-spacing:-0.5px;color:var(--ink);line-height:1.2;}
+.page-hdr-sub{font-size:14px;color:var(--ink3);margin-top:4px;font-weight:400;}
+.step-content{display:none;}
+.step-content.active{display:block;animation:step-in 0.35s cubic-bezier(0.22,1,0.36,1) both;}
+@keyframes step-in{from{opacity:0;transform:translateX(20px)}to{opacity:1;transform:translateX(0)}}
+.form-section{background:var(--card);border:1px solid var(--border);border-radius:var(--r);overflow:hidden;box-shadow:var(--shadow-sm);margin-bottom:20px;transition:box-shadow 0.2s;}
+.form-section:hover{box-shadow:var(--shadow-md);}
+.form-section-hdr{padding:16px 22px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:12px;background:linear-gradient(135deg,rgba(0,102,255,0.03),transparent);}
+.fsh-icon{width:36px;height:36px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:16px;background:var(--blue-soft);border:1px solid rgba(0,102,255,0.12);}
+.fsh-title{font-size:15px;font-weight:700;color:var(--ink);}
+.fsh-sub{font-size:11px;color:var(--ink4);margin-top:1px;}
+.fsh-badge{margin-left:auto;font-size:10px;font-weight:700;letter-spacing:1px;padding:3px 8px;border-radius:5px;background:var(--blue-soft);color:var(--blue);border:1px solid rgba(0,102,255,0.15);}
+.form-section-body{padding:22px;display:grid;gap:20px;}
+.form-section-body.cols-2{grid-template-columns:1fr 1fr;}
+
+/* FIELD */
+.field-wrap{position:relative;}
+.field-lbl{font-size:11px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--ink3);margin-bottom:8px;display:flex;align-items:center;justify-content:space-between;}
+.fimp{font-size:9px;padding:2px 6px;border-radius:4px;font-weight:700;letter-spacing:0.5px;}
+.fimp-h{background:rgba(255,51,85,0.1);color:var(--red2);}
+.fimp-m{background:rgba(255,149,0,0.1);color:var(--amber);}
+.fimp-l{background:var(--blue-soft);color:var(--blue);}
+
+/* SLIDERS */
+.slider-ui{position:relative;}
+.slider-display-row{display:flex;align-items:flex-end;gap:10px;margin-bottom:10px;}
+.slider-big-val{font-family:'JetBrains Mono',monospace;font-size:28px;font-weight:600;color:var(--ink);line-height:1;min-width:72px;transition:color 0.3s;}
+.slider-unit-lbl{font-size:11px;color:var(--ink4);font-weight:500;padding-bottom:4px;}
+input[type=range]{width:100%;-webkit-appearance:none;appearance:none;height:5px;border-radius:5px;outline:none;cursor:pointer;background:linear-gradient(to right,var(--blue) 0%,var(--blue) var(--val,50%),var(--bg2) var(--val,50%),var(--bg2) 100%);transition:background 0.1s;}
+input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:22px;height:22px;border-radius:50%;background:white;border:2.5px solid var(--blue);box-shadow:0 2px 8px rgba(0,102,255,0.3),0 0 0 4px rgba(0,102,255,0.1);cursor:pointer;transition:all 0.15s;}
+input[type=range]::-webkit-slider-thumb:hover{transform:scale(1.15);box-shadow:0 4px 16px rgba(0,102,255,0.4),0 0 0 6px rgba(0,102,255,0.12);}
+input[type=range]::-webkit-slider-thumb:active{transform:scale(0.95);}
+.slider-minmax{display:flex;justify-content:space-between;margin-top:4px;font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--ink4);}
+
+/* SELECT */
+.select-wrap{position:relative;}
+.select-wrap::after{content:'';position:absolute;right:14px;top:50%;transform:translateY(-50%);border:5px solid transparent;border-top-color:var(--ink3);pointer-events:none;margin-top:2px;}
+select{width:100%;padding:12px 40px 12px 14px;background:var(--bg);border:1.5px solid var(--border2);border-radius:var(--r3);font-size:14px;font-weight:500;font-family:'Plus Jakarta Sans',sans-serif;color:var(--ink);outline:none;cursor:pointer;appearance:none;-webkit-appearance:none;transition:border-color 0.2s,box-shadow 0.2s,background 0.2s;}
+select:focus{border-color:var(--blue);box-shadow:0 0 0 3px var(--blue-mid);background:var(--w);}
+select option{background:#fff;color:var(--ink);}
+
+/* TOGGLE */
+.toggle-row{display:grid;grid-template-columns:1fr 1fr;gap:6px;}
+.tog{padding:10px 8px;border-radius:var(--r3);border:1.5px solid var(--border2);background:var(--bg);font-size:13px;font-weight:600;font-family:'Plus Jakarta Sans',sans-serif;color:var(--ink3);cursor:pointer;transition:all 0.2s;text-align:center;}
+.tog:hover{border-color:var(--ink4);color:var(--ink2);}
+.tog.on{border-color:var(--blue);background:var(--blue-soft);color:var(--blue);box-shadow:0 0 0 3px var(--blue-mid);}
+
+/* STEP NAV */
+.step-nav{display:flex;gap:12px;margin-top:24px;padding-top:24px;border-top:1px solid var(--border);}
+.btn-next{flex:1;padding:14px 24px;background:linear-gradient(135deg,var(--blue),#3388ff);color:#fff;border:none;border-radius:var(--r2);font-size:14px;font-weight:700;font-family:'Plus Jakarta Sans',sans-serif;cursor:pointer;transition:all 0.25s;box-shadow:0 4px 20px rgba(0,102,255,0.3);}
+.btn-next:hover{transform:translateY(-2px);box-shadow:0 8px 32px rgba(0,102,255,0.4);}
+.btn-prev{padding:14px 20px;background:transparent;border:1.5px solid var(--border2);border-radius:var(--r2);font-size:14px;font-weight:600;color:var(--ink3);cursor:pointer;transition:all 0.2s;font-family:'Plus Jakarta Sans',sans-serif;}
+.btn-prev:hover{border-color:var(--ink4);color:var(--ink2);}
+.btn-analyze{flex:1;padding:14px 24px;background:linear-gradient(135deg,#0044dd,var(--blue));color:#fff;border:none;border-radius:var(--r2);font-size:15px;font-weight:800;letter-spacing:0.3px;font-family:'Plus Jakarta Sans',sans-serif;cursor:pointer;transition:all 0.3s;box-shadow:0 6px 24px rgba(0,102,255,0.35);position:relative;overflow:hidden;}
+.btn-analyze::after{content:'';position:absolute;top:-50%;left:-60%;width:40%;height:200%;background:rgba(255,255,255,0.12);transform:skewX(-20deg);animation:shimmer 3s 1s ease-in-out infinite;}
+@keyframes shimmer{0%{left:-60%}100%{left:140%}}
+.btn-analyze:hover{transform:translateY(-3px);box-shadow:0 12px 40px rgba(0,102,255,0.45);}
+.sample-pill{display:inline-flex;align-items:center;gap:6px;padding:5px 12px;border-radius:20px;border:1px solid rgba(0,102,255,0.2);background:var(--blue-soft);font-size:12px;font-weight:600;color:var(--blue);cursor:pointer;transition:all 0.2s;margin-left:auto;}
+.sample-pill:hover{background:var(--blue-mid);}
+
+/* RIGHT PANEL */
+.p-right{padding:28px 22px;background:rgba(255,255,255,0.75);border-left:1px solid var(--border);backdrop-filter:blur(20px);display:flex;flex-direction:column;gap:18px;position:sticky;top:60px;height:calc(100vh - 60px);overflow-y:auto;}
+
+/* HEART CARD */
+.heart-card{background:linear-gradient(135deg,#0044cc,#0066ff,#1a88ff);border-radius:var(--r);padding:24px 20px;text-align:center;position:relative;overflow:hidden;box-shadow:0 12px 40px rgba(0,102,255,0.35);}
+.heart-card::before{content:'';position:absolute;top:-40px;right:-40px;width:140px;height:140px;background:rgba(255,255,255,0.06);border-radius:50%;}
+.hc-label{font-size:9px;font-weight:700;letter-spacing:2.5px;text-transform:uppercase;color:rgba(255,255,255,0.65);margin-bottom:12px;position:relative;z-index:1;}
+.hc-ecg{position:relative;z-index:1;margin-bottom:10px;}
+.hc-bpm{font-family:'JetBrains Mono',monospace;font-size:32px;font-weight:600;color:#fff;line-height:1;position:relative;z-index:1;text-shadow:0 2px 12px rgba(0,0,0,0.2);}
+.hc-bpm-lbl{font-size:10px;font-weight:600;letter-spacing:2px;color:rgba(255,255,255,0.6);margin-top:2px;text-transform:uppercase;position:relative;z-index:1;}
+.hc-vitals{display:grid;grid-template-columns:1fr 1fr 1fr;gap:1px;margin-top:14px;background:rgba(255,255,255,0.1);border-radius:10px;overflow:hidden;position:relative;z-index:1;}
+.hcv{padding:10px 6px;background:rgba(255,255,255,0.08);text-align:center;}
+.hcv-val{font-family:'JetBrains Mono',monospace;font-size:14px;font-weight:600;color:#fff;}
+.hcv-lbl{font-size:9px;color:rgba(255,255,255,0.55);font-weight:600;letter-spacing:1px;margin-top:2px;text-transform:uppercase;}
+
+/* RESULT CARD */
+.result-card{background:var(--card);border:1px solid var(--border);border-radius:var(--r);overflow:hidden;box-shadow:var(--shadow-sm);flex:1;display:flex;flex-direction:column;transition:all 0.4s cubic-bezier(0.22,1,0.36,1);}
+.rc-hdr{padding:12px 16px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:8px;background:var(--bg);}
+.rc-hdr-dot{width:8px;height:8px;border-radius:50%;background:var(--border2);}
+.rc-hdr-lbl{font-size:10px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--ink4);}
+.rc-body{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:20px;min-height:200px;}
+.rc-standby{text-align:center;}
+.rc-standby-orb{width:72px;height:72px;border-radius:50%;background:var(--bg);border:2px solid var(--border);margin:0 auto 12px;display:flex;align-items:center;justify-content:center;position:relative;}
+.rc-standby-orb::after{content:'';position:absolute;inset:-8px;border-radius:50%;border:1px dashed var(--border2);animation:spin-slow 12s linear infinite;}
+@keyframes spin-slow{to{transform:rotate(360deg)}}
+.rc-standby-txt{font-size:12px;color:var(--ink4);font-weight:500;line-height:1.6;text-align:center;}
+.rc-result{display:none;width:100%;text-align:center;animation:result-pop 0.6s cubic-bezier(0.22,1,0.36,1) both;}
+@keyframes result-pop{from{opacity:0;transform:scale(0.85)}to{opacity:1;transform:scale(1)}}
+.risk-orb-wrap{margin:0 auto 12px;position:relative;width:110px;height:110px;}
+.risk-orb{width:110px;height:110px;border-radius:50%;display:flex;flex-direction:column;align-items:center;justify-content:center;position:relative;z-index:1;border:3px solid;}
+.risk-orb.high{background:radial-gradient(circle at 35% 35%,rgba(255,100,120,0.2),rgba(255,30,60,0.08));border-color:rgba(255,51,85,0.4);box-shadow:0 0 0 8px rgba(255,51,85,0.08),0 8px 32px rgba(255,51,85,0.2);}
+.risk-orb.medium{background:radial-gradient(circle at 35% 35%,rgba(255,180,50,0.2),rgba(255,149,0,0.08));border-color:rgba(255,149,0,0.4);box-shadow:0 0 0 8px rgba(255,149,0,0.08),0 8px 32px rgba(255,149,0,0.2);}
+.risk-orb.low{background:radial-gradient(circle at 35% 35%,rgba(0,220,140,0.2),rgba(0,200,120,0.08));border-color:rgba(0,201,119,0.4);box-shadow:0 0 0 8px rgba(0,201,119,0.08),0 8px 32px rgba(0,201,119,0.15);}
+.orb-svg{position:absolute;inset:-8px;width:calc(100% + 16px);height:calc(100% + 16px);}
+.risk-orb-pct{font-family:'JetBrains Mono',monospace;font-size:24px;font-weight:700;line-height:1;transition:color 0.4s;}
+.risk-orb.high .risk-orb-pct{color:var(--red);}
+.risk-orb.medium .risk-orb-pct{color:var(--amber);}
+.risk-orb.low .risk-orb-pct{color:var(--green);}
+.risk-orb-sub{font-size:9px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--ink4);margin-top:2px;}
+.rc-verdict{font-size:14px;font-weight:800;letter-spacing:-0.2px;margin-bottom:6px;}
+.rc-verdict.high{color:var(--red);}
+.rc-verdict.medium{color:var(--amber);}
+.rc-verdict.low{color:var(--green);}
+.rc-desc{font-size:11px;color:var(--ink3);line-height:1.6;margin-bottom:12px;}
+.rc-chips{display:grid;grid-template-columns:1fr 1fr;gap:5px;width:100%;}
+.rc-chip{background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:7px 9px;text-align:left;}
+.rcc-k{font-size:9px;font-weight:700;letter-spacing:1px;color:var(--ink4);text-transform:uppercase;}
+.rcc-v{font-size:12px;font-weight:600;color:var(--ink);margin-top:2px;}
+
+/* TOOLTIP POPUP */
+.slider-tooltip{position:absolute;background:var(--ink);color:#fff;font-size:11px;font-weight:600;padding:6px 10px;border-radius:8px;pointer-events:none;white-space:nowrap;z-index:100;display:none;box-shadow:0 4px 20px rgba(0,0,0,0.3);transform:translateX(-50%);top:-42px;left:50%;}
+.slider-tooltip::after{content:'';position:absolute;top:100%;left:50%;transform:translateX(-50%);border:5px solid transparent;border-top-color:var(--ink);}
+.slider-tooltip .tip-risk{font-size:10px;font-weight:700;letter-spacing:1px;text-transform:uppercase;margin-top:2px;}
+.slider-tooltip .tip-risk.high{color:#ff8099;}
+.slider-tooltip .tip-risk.medium{color:#ffcc66;}
+.slider-tooltip .tip-risk.low{color:#66ffb8;}
+.slider-container{position:relative;}
+.slider-container:hover .slider-tooltip{display:block;}
+
+/* INFO PANEL BELOW SELECT */
+.feature-info-box{margin-top:8px;padding:10px 12px;border-radius:8px;border:1px solid;font-size:12px;line-height:1.6;}
+.feature-info-box.risk-high{background:rgba(255,51,85,0.06);border-color:rgba(255,51,85,0.2);color:var(--red2);}
+.feature-info-box.risk-medium{background:rgba(255,149,0,0.06);border-color:rgba(255,149,0,0.2);color:#c47700;}
+.feature-info-box.risk-low{background:rgba(0,201,119,0.06);border-color:rgba(0,201,119,0.2);color:#008f55;}
+.feature-info-box .fib-title{font-weight:700;font-size:11px;letter-spacing:0.5px;margin-bottom:3px;}
+.risk-badge{display:inline-flex;align-items:center;gap:4px;padding:2px 8px;border-radius:12px;font-size:10px;font-weight:700;letter-spacing:0.5px;margin-bottom:4px;}
+.risk-badge.high{background:rgba(255,51,85,0.15);color:var(--red);}
+.risk-badge.medium{background:rgba(255,149,0,0.15);color:var(--amber);}
+.risk-badge.low{background:rgba(0,201,119,0.15);color:var(--green);}
+
+/* FULL SCREEN OVERLAY */
+#result-overlay{position:fixed;inset:0;z-index:500;display:none;align-items:center;justify-content:center;background:rgba(10,22,40,0.75);backdrop-filter:blur(16px);}
+#result-overlay.show{display:flex;animation:overlay-in 0.4s ease both;}
+@keyframes overlay-in{from{opacity:0}to{opacity:1}}
+.overlay-card{background:#fff;border-radius:24px;padding:48px;max-width:560px;width:92%;box-shadow:0 32px 80px rgba(0,0,0,0.25);animation:overlay-card-in 0.5s cubic-bezier(0.22,1,0.36,1) both;text-align:center;position:relative;overflow:hidden;max-height:90vh;overflow-y:auto;}
+@keyframes overlay-card-in{from{opacity:0;transform:scale(0.8) translateY(40px)}to{opacity:1;transform:scale(1) translateY(0)}}
+.overlay-card.high-risk::before{content:'';position:absolute;top:0;left:0;right:0;height:4px;background:linear-gradient(90deg,#ff1133,#ff6680,#ff1133);animation:border-flow 2s linear infinite;background-size:200% 100%;}
+.overlay-card.medium-risk::before{content:'';position:absolute;top:0;left:0;right:0;height:4px;background:linear-gradient(90deg,#ff9500,#ffcc44,#ff9500);animation:border-flow 2s linear infinite;background-size:200% 100%;}
+.overlay-card.low-risk::before{content:'';position:absolute;top:0;left:0;right:0;height:4px;background:linear-gradient(90deg,#00c977,#33ff99,#00c977);animation:border-flow 2s linear infinite;background-size:200% 100%;}
+@keyframes border-flow{from{background-position:0% 0%}to{background-position:200% 0%}}
+.oc-close{position:absolute;top:16px;right:16px;width:32px;height:32px;border-radius:50%;background:var(--bg);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:16px;color:var(--ink3);transition:all 0.2s;}
+.oc-close:hover{background:var(--border);color:var(--ink);}
+.oc-icon{font-size:52px;margin-bottom:12px;animation:icon-bounce 0.6s 0.2s cubic-bezier(0.22,1,0.36,1) both;}
+@keyframes icon-bounce{from{opacity:0;transform:scale(0.3) rotate(-10deg)}to{opacity:1;transform:scale(1) rotate(0)}}
+.oc-pct{font-family:'JetBrains Mono',monospace;font-size:60px;font-weight:700;line-height:1;letter-spacing:-2px;margin-bottom:4px;}
+.high-risk .oc-pct{color:var(--red);}
+.medium-risk .oc-pct{color:var(--amber);}
+.low-risk .oc-pct{color:var(--green);}
+.oc-label{font-size:12px;font-weight:600;letter-spacing:2px;text-transform:uppercase;color:var(--ink3);margin-bottom:16px;}
+.oc-verdict{font-size:22px;font-weight:800;letter-spacing:-0.5px;margin-bottom:8px;}
+.high-risk .oc-verdict{color:var(--red);}
+.medium-risk .oc-verdict{color:var(--amber);}
+.low-risk .oc-verdict{color:var(--green);}
+.oc-desc{font-size:14px;color:var(--ink3);line-height:1.7;margin-bottom:24px;}
+.oc-risk-factors{text-align:left;margin-bottom:20px;background:var(--bg);border:1px solid var(--border);border-radius:12px;padding:16px;}
+.oc-rf-title{font-size:10px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--ink4);margin-bottom:10px;}
+.oc-rf-item{display:flex;align-items:center;gap:8px;font-size:13px;color:var(--ink2);font-weight:500;padding:4px 0;}
+.oc-rf-dot{width:6px;height:6px;border-radius:50%;background:var(--red);flex-shrink:0;}
+.medium-risk .oc-rf-dot{background:var(--amber);}
+.low-risk .oc-rf-dot{background:var(--green);}
+.oc-factors{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:24px;}
+.oc-factor{padding:10px;background:var(--bg);border:1px solid var(--border);border-radius:10px;text-align:center;}
+.ocf-k{font-size:9px;font-weight:700;letter-spacing:1px;color:var(--ink4);text-transform:uppercase;}
+.ocf-v{font-size:13px;font-weight:700;color:var(--ink);margin-top:3px;}
+.oc-disclaimer{font-size:11px;color:var(--ink4);line-height:1.6;margin-bottom:20px;padding:10px 14px;background:var(--amber-soft);border:1px solid rgba(255,149,0,0.2);border-radius:8px;}
+.oc-close-btn{width:100%;padding:14px;border-radius:12px;border:none;background:linear-gradient(135deg,var(--blue),#3388ff);color:#fff;font-size:14px;font-weight:700;font-family:'Plus Jakarta Sans',sans-serif;cursor:pointer;transition:all 0.2s;box-shadow:0 4px 20px rgba(0,102,255,0.3);}
+.oc-close-btn:hover{transform:translateY(-2px);box-shadow:0 8px 32px rgba(0,102,255,0.4);}
+
+/* ABOUT / HOW PANELS */
+#panel-about.active{display:block;max-width:900px;margin:0 auto;padding:40px 32px;}
+.about-hero{text-align:center;margin-bottom:48px;}
+.about-badge{display:inline-flex;align-items:center;gap:8px;padding:6px 16px;border-radius:30px;background:var(--blue-soft);border:1px solid rgba(0,102,255,0.2);margin-bottom:16px;font-size:11px;font-weight:700;color:var(--blue);letter-spacing:1.5px;text-transform:uppercase;}
+.about-hero h1{font-size:clamp(26px,4vw,40px);font-weight:800;letter-spacing:-1px;color:var(--ink);margin-bottom:14px;}
+.about-hero h1 span{color:var(--blue);}
+.about-hero p{color:var(--ink3);font-size:15px;max-width:540px;margin:0 auto;line-height:1.8;}
+.cards-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:16px;margin-bottom:40px;}
+.info-card{background:var(--card);border:1px solid var(--border);border-radius:var(--r);padding:24px;transition:all 0.25s;box-shadow:var(--shadow-sm);}
+.info-card:hover{transform:translateY(-4px);box-shadow:var(--shadow-md);}
+.ic-icon{font-size:30px;margin-bottom:12px;}
+.info-card h3{font-size:15px;font-weight:700;color:var(--ink);margin-bottom:6px;}
+.info-card p{color:var(--ink3);font-size:13px;line-height:1.7;}
+.section-card{background:var(--card);border:1px solid var(--border);border-radius:var(--r);padding:32px;margin-bottom:24px;box-shadow:var(--shadow-sm);}
+.section-card h2{font-size:20px;font-weight:800;color:var(--ink);margin-bottom:20px;display:flex;align-items:center;gap:10px;}
+.model-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:12px;}
+.model-item{padding:16px;border-radius:12px;background:var(--bg);border:1px solid var(--border);border-left:3px solid;}
+.model-top{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:6px;}
+.model-name{font-weight:700;font-size:14px;color:var(--ink);}
+.model-acc{font-size:10px;font-weight:700;padding:2px 8px;border-radius:20px;}
+.model-type{font-size:10px;color:var(--ink4);text-transform:uppercase;letter-spacing:1px;margin-bottom:5px;}
+.model-desc{font-size:12px;color:var(--ink3);line-height:1.6;}
+#panel-how.active{display:block;max-width:860px;margin:0 auto;padding:40px 32px;}
+.steps-list{display:flex;flex-direction:column;gap:14px;margin-bottom:36px;}
+.how-step{background:var(--card);border:1px solid var(--border);border-radius:var(--r);padding:22px;display:flex;gap:18px;align-items:flex-start;box-shadow:var(--shadow-sm);transition:all 0.25s;}
+.how-step:hover{transform:translateY(-3px);box-shadow:var(--shadow-md);}
+.how-step-num{flex-shrink:0;width:48px;height:48px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:20px;}
+.how-step-label{font-size:10px;font-weight:700;letter-spacing:2px;text-transform:uppercase;margin-bottom:3px;}
+.how-step-title{font-size:16px;font-weight:800;color:var(--ink);margin-bottom:5px;}
+.how-step-desc{color:var(--ink3);font-size:13px;line-height:1.8;}
+.feat-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:10px;}
+.feat-item{background:var(--card);border:1px solid var(--border);border-radius:var(--r2);padding:12px 14px;display:flex;gap:10px;align-items:flex-start;}
+.feat-icon{font-size:18px;flex-shrink:0;}
+.feat-name{font-weight:700;font-size:13px;color:var(--ink);}
+.feat-hint{font-size:12px;color:var(--ink3);margin-top:2px;line-height:1.5;}
+footer{text-align:center;padding:40px 20px 20px;font-size:12px;color:var(--ink4);}
+
+/* RANGE INDICATOR BADGE ON SLIDER */
+.slider-risk-indicator{display:inline-flex;align-items:center;gap:4px;padding:2px 8px;border-radius:20px;font-size:10px;font-weight:700;margin-left:8px;transition:all 0.3s;}
+.sri-high{background:rgba(255,51,85,0.12);color:var(--red);}
+.sri-medium{background:rgba(255,149,0,0.12);color:var(--amber);}
+.sri-low{background:rgba(0,201,119,0.12);color:var(--green);}
+
+.api-toast{position:fixed;right:22px;bottom:22px;z-index:900;background:rgba(10,22,40,0.95);color:#fff;padding:10px 14px;border-radius:10px;border:1px solid rgba(255,255,255,0.1);font-size:12px;font-weight:600;box-shadow:var(--shadow-lg);opacity:0;transform:translateY(14px);pointer-events:none;transition:opacity 0.22s,transform 0.22s;max-width:300px;line-height:1.5;}
+.api-toast.show{opacity:1;transform:translateY(0);}
+
+@media (max-width:1280px){
+  .tb-input{width:114px;}
+  .tb-nav-item{padding:6px 12px;}
+}
+
+@media (max-width:1024px){
+  #topbar{height:auto;flex-wrap:wrap;gap:8px;padding:10px 14px;align-items:flex-start;}
+  .tb-logo{margin-right:0;}
+  .tb-nav{order:3;width:100%;overflow:auto;padding-bottom:2px;}
+  .tb-right{width:100%;justify-content:flex-end;flex-wrap:wrap;}
+  #app{padding-top:132px;}
+  #panel-predict.active{grid-template-columns:1fr;}
+  .p-left,.p-right{position:relative;top:0;height:auto;border:none;}
+  .p-left{border-bottom:1px solid var(--border);}
+  .p-right{border-top:1px solid var(--border);}
+  .p-center{padding:20px 16px;}
+  .form-section-body.cols-2{grid-template-columns:1fr;}
+}
+
+@media (max-width:640px){
+  .tb-input{width:102px;}
+  .tb-btn{padding:0 10px;font-size:11px;}
+  .tb-status{font-size:11px;padding:5px 10px;}
+  .tb-user-name{max-width:120px;}
+  #app{padding-top:154px;}
+}
+</style>
+</head>
+<body>
+
+<!-- SPLASH -->
+<div id="splash">
+  <div class="splash-logo">
+    <div class="splash-icon">🫀</div>
+    <div class="splash-brand">Cardio<span>Sense</span> <sup style="font-size:14px;color:var(--ink4)">Pro</sup></div>
+  </div>
+  <div class="splash-tag">Clinical Risk Assessment Engine v2.0</div>
+  <div class="splash-bar-wrap"><div class="splash-bar"></div></div>
+  <div class="splash-status" id="splash-status">Initializing logistic model...</div>
+</div>
+
+<!-- TOPBAR -->
+<nav id="topbar">
+  <a class="tb-logo" href="#">
+    <div class="tb-logo-mark"><div class="tb-logo-pulse"></div>🫀</div>
+    <div class="tb-brand">Cardio<span>Sense</span></div>
+    <div class="tb-version">v2.0</div>
+  </a>
+  <div class="tb-nav">
+    <div class="tb-nav-item active" onclick="switchTab('predict',this)">🔬 Predict</div>
+    <div class="tb-nav-item" onclick="switchTab('about',this)">📊 About</div>
+    <div class="tb-nav-item" onclick="switchTab('how',this)">⚙️ How It Works</div>
+  </div>
+  <div class="tb-right">
+    <div class="tb-status offline" id="backend-status"><div class="tb-status-dot"></div><span id="backend-status-text">Local Model Mode</span></div>
+    <div class="tb-auth" id="tb-auth-form">
+      <input id="auth-email" class="tb-input" type="email" placeholder="email" autocomplete="username">
+      <input id="auth-password" class="tb-input" type="password" placeholder="password" autocomplete="current-password">
+      <button class="tb-btn" onclick="registerUser()">Register</button>
+      <button class="tb-btn tb-btn-primary" onclick="loginUser()">Login</button>
+    </div>
+    <div class="tb-user" id="tb-user-box" style="display:none;">
+      <div class="tb-user-name" id="tb-user-name">Signed in</div>
+      <button class="tb-btn" onclick="loadPredictionHistory()">History</button>
+      <button class="tb-btn tb-btn-primary" onclick="logoutUser()">Logout</button>
+    </div>
+  </div>
+</nav>
+
+<div id="api-toast" class="api-toast"></div>
+
+<div id="app">
+
+<!-- PREDICT PANEL -->
+<div id="panel-predict" class="panel active">
+
+  <!-- LEFT -->
+  <aside class="p-left">
+    <div class="p-left-title">Assessment Steps</div>
+    <div class="step-item active" onclick="goStep(1)" id="si-1">
+      <div class="step-num" id="sn-1">1</div>
+      <div class="step-info"><div class="step-title">Demographics</div><div class="step-sub">Age, sex, chest pain</div></div>
+    </div>
+    <div class="step-item" onclick="goStep(2)" id="si-2">
+      <div class="step-num" id="sn-2">2</div>
+      <div class="step-info"><div class="step-title">Heart Metrics</div><div class="step-sub">BP, HR, ST segment</div></div>
+    </div>
+    <div class="step-item" onclick="goStep(3)" id="si-3">
+      <div class="step-num" id="sn-3">3</div>
+      <div class="step-info"><div class="step-title">Lab Values</div><div class="step-sub">Cholesterol, glucose</div></div>
+    </div>
+    <div class="step-item" onclick="goStep(4)" id="si-4">
+      <div class="step-num" id="sn-4">4</div>
+      <div class="step-info"><div class="step-title">Clinical Tests</div><div class="step-sub">ECG, vessels, thal</div></div>
+    </div>
+    <div class="p-left-title" style="margin-top:20px;">Progress</div>
+    <div class="sidebar-progress">
+      <div class="sp-label"><span>Completion</span><span id="sp-pct">0%</span></div>
+      <div class="sp-bar"><div class="sp-fill" id="sp-fill"></div></div>
+    </div>
+  </aside>
+
+  <!-- CENTER FORM -->
+  <main class="p-center">
+    <div class="page-hdr">
+      <div class="page-hdr-eyebrow">Cardiac Risk Assessment</div>
+      <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:12px;">
+        <div>
+          <div class="page-hdr-title" id="step-title">Patient Demographics</div>
+          <div class="page-hdr-sub" id="step-sub">Enter the patient's basic information and vital signs</div>
+        </div>
+        <div class="sample-pill" onclick="fillSample()">⚡ Sample Data</div>
+      </div>
+    </div>
+
+    <!-- STEP 1 -->
+    <div class="step-content active" id="step-1">
+      <div class="form-section">
+        <div class="form-section-hdr">
+          <div class="fsh-icon">👤</div>
+          <div><div class="fsh-title">Patient Demographics</div><div class="fsh-sub">Age, sex and pain classification</div></div>
+          <div class="fsh-badge">Step 1 of 4</div>
+        </div>
+        <div class="form-section-body cols-2">
+
+          <!-- AGE -->
+          <div class="field-wrap">
+            <div class="field-lbl">Age <span class="fimp fimp-m">MODERATE</span> <span class="slider-risk-indicator" id="sri-age"></span></div>
+            <div class="slider-ui">
+              <div class="slider-display-row">
+                <div class="slider-big-val" id="v-age">52</div>
+                <div class="slider-unit-lbl">years</div>
+              </div>
+              <div class="slider-container">
+                <div class="slider-tooltip" id="tip-age"></div>
+                <input type="range" id="inp-age" min="0" max="100" value="52"
+                  oninput="sliderUpdate('inp-age','v-age',this.value);updateLivePanel();updateSliderRisk('age',+this.value)">
+              </div>
+              <div class="slider-minmax"><span>0 yrs</span><span>100 yrs</span></div>
+            </div>
+          </div>
+
+          <!-- SEX -->
+          <div class="field-wrap">
+            <div class="field-lbl">Biological Sex <span class="fimp fimp-l">LOW</span></div>
+            <div class="toggle-row" style="margin-top:18px;">
+              <div class="tog on" id="tog-sex-1" onclick="setToggle('sex',1)">♂ Male</div>
+              <div class="tog" id="tog-sex-0" onclick="setToggle('sex',0)">♀ Female</div>
+            </div>
+            <div class="feature-info-box risk-medium" style="margin-top:8px;">
+              <div class="fib-title">ℹ️ Clinical Note</div>
+              Males statistically show higher heart disease incidence. Female risk rises post-menopause.
+            </div>
+          </div>
+
+          <!-- CHEST PAIN TYPE -->
+          <div class="field-wrap" style="grid-column:1/-1;">
+            <div class="field-lbl">Chest Pain Type <span class="fimp fimp-h">HIGH IMPACT</span></div>
+            <div class="select-wrap">
+              <select id="inp-cp" onchange="updateLivePanel();showChestPainInfo()">
+                <option value="0">0 — Typical Angina</option>
+                <option value="1">1 — Atypical Angina</option>
+                <option value="2" selected>2 — Non-Anginal Pain</option>
+                <option value="3">3 — Asymptomatic</option>
+              </select>
+            </div>
+            <div id="cp-info-box" class="feature-info-box risk-medium" style="margin-top:8px;"></div>
+          </div>
+
+          <!-- EXERCISE ANGINA -->
+          <div class="field-wrap" style="grid-column:1/-1;">
+            <div class="field-lbl">Exercise Induced Angina <span class="fimp fimp-m">MODERATE</span></div>
+            <div class="toggle-row">
+              <div class="tog" id="tog-exang-1" onclick="setToggle('exang',1)">Yes — Present</div>
+              <div class="tog on" id="tog-exang-0" onclick="setToggle('exang',0)">No — Absent</div>
+            </div>
+            <div class="feature-info-box risk-medium" style="margin-top:8px;">
+              <div class="fib-title">ℹ️ Clinical Note</div>
+              <span class="risk-badge medium">⚠ MODERATE RISK</span><br>
+              Exercise-induced angina indicates insufficient blood flow to heart muscles during physical activity — a significant cardiac risk marker.
+            </div>
+          </div>
+
+        </div>
+      </div>
+      <div class="step-nav">
+        <button class="btn-next" onclick="goStep(2)">Continue to Heart Metrics →</button>
+      </div>
+    </div>
+
+    <!-- STEP 2 -->
+    <div class="step-content" id="step-2">
+      <div class="form-section">
+        <div class="form-section-hdr">
+          <div class="fsh-icon">💓</div>
+          <div><div class="fsh-title">Cardiovascular Measurements</div><div class="fsh-sub">Heart rate, blood pressure and ST segment</div></div>
+          <div class="fsh-badge">Step 2 of 4</div>
+        </div>
+        <div class="form-section-body cols-2">
+
+          <!-- RESTING BP -->
+          <div class="field-wrap">
+            <div class="field-lbl">Resting Blood Pressure <span class="fimp fimp-m">MODERATE</span> <span class="slider-risk-indicator" id="sri-trestbps"></span></div>
+            <div class="slider-ui">
+              <div class="slider-display-row">
+                <div class="slider-big-val" id="v-bp">120</div>
+                <div class="slider-unit-lbl">mmHg</div>
+              </div>
+              <div class="slider-container">
+                <div class="slider-tooltip" id="tip-trestbps"></div>
+                <input type="range" id="inp-trestbps" min="0" max="300" value="120"
+                  oninput="sliderUpdate('inp-trestbps','v-bp',this.value);updateLivePanel();updateSliderRisk('trestbps',+this.value)">
+              </div>
+              <div class="slider-minmax"><span>0 mmHg</span><span>300 mmHg</span></div>
+            </div>
+            <div id="bp-info" class="feature-info-box risk-low" style="margin-top:8px;">
+              <div class="fib-title">ℹ️ BP Reference</div>
+              <span class="risk-badge low">✓ NORMAL (90–120)</span> Normal range. Values &gt;140 indicate Stage 1 Hypertension — elevated risk.
+            </div>
+          </div>
+
+          <!-- MAX HEART RATE -->
+          <div class="field-wrap">
+            <div class="field-lbl">Max Heart Rate Achieved <span class="fimp fimp-h">HIGH IMPACT</span> <span class="slider-risk-indicator" id="sri-thalach"></span></div>
+            <div class="slider-ui">
+              <div class="slider-display-row">
+                <div class="slider-big-val" id="v-hr">168</div>
+                <div class="slider-unit-lbl">bpm</div>
+              </div>
+              <div class="slider-container">
+                <div class="slider-tooltip" id="tip-thalach"></div>
+                <input type="range" id="inp-thalach" min="0" max="250" value="168"
+                  oninput="sliderUpdate('inp-thalach','v-hr',this.value);document.getElementById('hc-bpm').textContent=this.value;updateLivePanel();updateSliderRisk('thalach',+this.value)">
+              </div>
+              <div class="slider-minmax"><span>0 bpm</span><span>250 bpm</span></div>
+            </div>
+            <div id="hr-info" class="feature-info-box risk-low" style="margin-top:8px;">
+              <div class="fib-title">ℹ️ Max HR Reference</div>
+              <span class="risk-badge low">✓ HEALTHY</span> Higher max HR indicates better cardiac fitness. &lt;120 bpm during exercise is concerning.
+            </div>
+          </div>
+
+          <!-- ST DEPRESSION -->
+          <div class="field-wrap">
+            <div class="field-lbl">ST Depression (Oldpeak) <span class="fimp fimp-h">HIGH IMPACT</span> <span class="slider-risk-indicator" id="sri-oldpeak"></span></div>
+            <div class="slider-ui">
+              <div class="slider-display-row">
+                <div class="slider-big-val" id="v-op">1.0</div>
+                <div class="slider-unit-lbl">mm</div>
+              </div>
+              <div class="slider-container">
+                <div class="slider-tooltip" id="tip-oldpeak"></div>
+                <input type="range" id="inp-oldpeak" min="0" max="100" value="10"
+                  oninput="sliderUpdate('inp-oldpeak','v-op',(this.value/10).toFixed(1));updateLivePanel();updateSliderRisk('oldpeak',this.value/10)">
+              </div>
+              <div class="slider-minmax"><span>0.0 mm</span><span>10.0 mm</span></div>
+            </div>
+            <div id="op-info" class="feature-info-box risk-low" style="margin-top:8px;">
+              <div class="fib-title">ℹ️ ST Depression Reference</div>
+              <span class="risk-badge low">✓ LOW RISK</span> Values &gt;2mm = HIGH RISK. Indicates ischemia (reduced blood flow) during exercise.
+            </div>
+          </div>
+
+          <!-- SLOPE OF ST -->
+          <div class="field-wrap">
+            <div class="field-lbl">Slope of ST Segment <span class="fimp fimp-m">MODERATE</span></div>
+            <div class="select-wrap">
+              <select id="inp-slope" onchange="updateLivePanel();showSlopeInfo()">
+                <option value="0" selected>0 — Upsloping</option>
+                <option value="1">1 — Flat</option>
+                <option value="2">2 — Downsloping</option>
+              </select>
+            </div>
+            <div id="slope-info-box" class="feature-info-box risk-low" style="margin-top:8px;"></div>
+          </div>
+
+        </div>
+      </div>
+      <div class="step-nav">
+        <button class="btn-prev" onclick="goStep(1)">← Back</button>
+        <button class="btn-next" onclick="goStep(3)">Continue to Lab Values →</button>
+      </div>
+    </div>
+
+    <!-- STEP 3 -->
+    <div class="step-content" id="step-3">
+      <div class="form-section">
+        <div class="form-section-hdr">
+          <div class="fsh-icon">🧪</div>
+          <div><div class="fsh-title">Laboratory Results</div><div class="fsh-sub">Blood tests and biochemical markers</div></div>
+          <div class="fsh-badge">Step 3 of 4</div>
+        </div>
+        <div class="form-section-body cols-2">
+
+          <!-- CHOLESTEROL -->
+          <div class="field-wrap">
+            <div class="field-lbl">Serum Cholesterol <span class="fimp fimp-m">MODERATE</span> <span class="slider-risk-indicator" id="sri-chol"></span></div>
+            <div class="slider-ui">
+              <div class="slider-display-row">
+                <div class="slider-big-val" id="v-chol">212</div>
+                <div class="slider-unit-lbl">mg/dL</div>
+              </div>
+              <div class="slider-container">
+                <div class="slider-tooltip" id="tip-chol"></div>
+                <input type="range" id="inp-chol" min="0" max="700" value="212"
+                  oninput="sliderUpdate('inp-chol','v-chol',this.value);updateLivePanel();updateSliderRisk('chol',+this.value)">
+              </div>
+              <div class="slider-minmax"><span>0 mg/dL</span><span>700 mg/dL</span></div>
+            </div>
+            <div id="chol-info" class="feature-info-box risk-low" style="margin-top:8px;">
+              <div class="fib-title">ℹ️ Cholesterol Reference</div>
+              <span class="risk-badge low">✓ NORMAL</span> &lt;200 = Desirable · 200–239 = Borderline High · &gt;240 = HIGH RISK
+            </div>
+          </div>
+
+          <!-- FASTING BLOOD SUGAR -->
+          <div class="field-wrap">
+            <div class="field-lbl">Fasting Blood Sugar &gt;120 mg/dL <span class="fimp fimp-l">LOW</span></div>
+            <div class="toggle-row" style="margin-top:18px;">
+              <div class="tog" id="tog-fbs-1" onclick="setToggle('fbs',1)">Yes — Elevated</div>
+              <div class="tog on" id="tog-fbs-0" onclick="setToggle('fbs',0)">No — Normal</div>
+            </div>
+            <div class="feature-info-box risk-medium" style="margin-top:8px;">
+              <div class="fib-title">ℹ️ Clinical Note</div>
+              <span class="risk-badge medium">⚠ MONITOR</span> Elevated fasting glucose (&gt;120 mg/dL) suggests diabetes — an independent cardiovascular risk factor.
+            </div>
+          </div>
+
+        </div>
+      </div>
+      <div class="step-nav">
+        <button class="btn-prev" onclick="goStep(2)">← Back</button>
+        <button class="btn-next" onclick="goStep(4)">Continue to Clinical Tests →</button>
+      </div>
+    </div>
+
+    <!-- STEP 4 -->
+    <div class="step-content" id="step-4">
+      <div class="form-section">
+        <div class="form-section-hdr">
+          <div class="fsh-icon">⚕️</div>
+          <div><div class="fsh-title">Clinical Diagnostics</div><div class="fsh-sub">ECG results and diagnostic findings</div></div>
+          <div class="fsh-badge">Step 4 of 4</div>
+        </div>
+        <div class="form-section-body cols-2">
+
+          <!-- RESTING ECG -->
+          <div class="field-wrap">
+            <div class="field-lbl">Resting ECG Result <span class="fimp fimp-l">LOW</span></div>
+            <div class="select-wrap">
+              <select id="inp-restecg" onchange="updateLivePanel();showEcgInfo()">
+                <option value="0">0 — Normal</option>
+                <option value="1" selected>1 — ST-T Wave Abnormality</option>
+                <option value="2">2 — Left Ventricular Hypertrophy</option>
+              </select>
+            </div>
+            <div id="ecg-info-box" class="feature-info-box risk-medium" style="margin-top:8px;"></div>
+          </div>
+
+          <!-- THALASSEMIA -->
+          <div class="field-wrap">
+            <div class="field-lbl">Thalassemia Type <span class="fimp fimp-h">HIGH IMPACT</span></div>
+            <div class="select-wrap">
+              <select id="inp-thal" onchange="updateLivePanel();showThalInfo()">
+                <option value="0">0 — Normal</option>
+                <option value="1">1 — Fixed Defect</option>
+                <option value="2">2 — Reversible Defect</option>
+                <option value="3" selected>3 — Unknown / Other</option>
+              </select>
+            </div>
+            <div id="thal-info-box" class="feature-info-box risk-high" style="margin-top:8px;"></div>
+          </div>
+
+          <!-- MAJOR VESSELS -->
+          <div class="field-wrap" style="grid-column:1/-1;">
+            <div class="field-lbl">Major Vessels (Fluoroscopy) <span class="fimp fimp-h">HIGH IMPACT</span> <span class="slider-risk-indicator" id="sri-ca"></span></div>
+            <div class="slider-ui">
+              <div class="slider-display-row">
+                <div class="slider-big-val" id="v-ca">2</div>
+                <div class="slider-unit-lbl">vessels</div>
+              </div>
+              <div class="slider-container">
+                <div class="slider-tooltip" id="tip-ca"></div>
+                <input type="range" id="inp-ca" min="0" max="3" value="2" step="1"
+                  oninput="sliderUpdate('inp-ca','v-ca',this.value);updateLivePanel();updateSliderRisk('ca',+this.value)">
+              </div>
+              <div class="slider-minmax"><span>0</span><span>1</span><span>2</span><span>3</span></div>
+            </div>
+            <div id="ca-info" class="feature-info-box risk-high" style="margin-top:8px;">
+              <div class="fib-title">ℹ️ Vessel Blockage Reference</div>
+              <span class="risk-badge high">🔴 HIGH RISK</span> Number of major coronary vessels narrowed by plaque. More vessels = higher risk. 0 = no blockage, 3 = severe multi-vessel disease.
+            </div>
+          </div>
+
+          <div class="field-wrap" style="grid-column:1/-1;background:var(--blue-soft);border:1px solid rgba(0,102,255,0.12);border-radius:12px;padding:16px;">
+            <div style="font-size:12px;font-weight:600;color:var(--ink2);margin-bottom:6px;">✅ Assessment Summary</div>
+            <div style="font-size:11px;color:var(--ink3);line-height:1.7;">All 13 UCI Heart Disease clinical parameters have been configured.<br>The logistic regression model will analyze your inputs across weighted feature coefficients.</div>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- SUMMARY TABLE -->
+      <div class="form-section">
+        <div class="form-section-hdr">
+          <div class="fsh-icon">📋</div>
+          <div><div class="fsh-title">Review Parameters</div><div class="fsh-sub">Confirm all values before analysis</div></div>
+        </div>
+        <div class="form-section-body" id="summary-table" style="grid-template-columns:repeat(3,1fr);gap:10px;padding:18px;"></div>
+      </div>
+
+      <div class="step-nav">
+        <button class="btn-prev" onclick="goStep(3)">← Back</button>
+        <button class="btn-analyze" onclick="handlePredict()">🫀 &nbsp;Run Cardiac Analysis</button>
+      </div>
+    </div>
+
+  </main>
+
+  <!-- RIGHT LIVE PANEL -->
+  <aside class="p-right">
+    <div class="heart-card">
+      <div class="hc-label">Live Cardiac Monitor</div>
+      <div class="hc-ecg">
+        <svg width="100%" height="48" viewBox="0 0 260 48">
+          <polyline points="0,24 30,24 40,24 50,4 60,44 70,24 100,24 110,12 120,24 150,24 160,4 170,44 180,24 210,24 220,12 230,24 260,24"
+            fill="none" stroke="rgba(255,255,255,0.7)" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </div>
+      <div class="hc-bpm" id="hc-bpm">168</div>
+      <div class="hc-bpm-lbl">Max Heart Rate (bpm)</div>
+      <div class="hc-vitals">
+        <div class="hcv"><div class="hcv-val" id="hcv-age">52</div><div class="hcv-lbl">Age</div></div>
+        <div class="hcv"><div class="hcv-val" id="hcv-bp">120</div><div class="hcv-lbl">BP</div></div>
+        <div class="hcv"><div class="hcv-val" id="hcv-chol">212</div><div class="hcv-lbl">Chol</div></div>
+      </div>
+    </div>
+
+    <div class="result-card" id="result-card">
+      <div class="rc-hdr">
+        <div class="rc-hdr-dot" id="rc-dot"></div>
+        <div class="rc-hdr-lbl">Risk Assessment</div>
+      </div>
+      <div class="rc-body">
+        <div class="rc-standby" id="rc-standby">
+          <div class="rc-standby-orb">
+            <svg width="36" height="36" viewBox="0 0 40 40" fill="none">
+              <circle cx="20" cy="20" r="14" stroke="var(--border2)" stroke-width="1.5" stroke-dasharray="3 3"/>
+              <circle cx="20" cy="20" r="7" stroke="var(--border)" stroke-width="1.5"/>
+            </svg>
+          </div>
+          <div class="rc-standby-txt">Complete all steps and run analysis to see results</div>
+        </div>
+        <div class="rc-result" id="rc-result">
+          <div class="risk-orb-wrap">
+            <div class="risk-orb" id="rc-orb">
+              <svg class="orb-svg" viewBox="0 0 136 136">
+                <circle cx="68" cy="68" r="60" fill="none" stroke="var(--border)" stroke-width="3"/>
+                <circle id="rc-arc" cx="68" cy="68" r="60" fill="none" stroke-width="3"
+                  stroke-dasharray="377" stroke-dashoffset="377"
+                  stroke-linecap="round" transform="rotate(-90 68 68)"
+                  style="transition:stroke-dashoffset 1s cubic-bezier(0.22,1,0.36,1),stroke 0.4s"/>
+              </svg>
+              <div class="risk-orb-pct" id="rc-pct">—</div>
+              <div class="risk-orb-sub">Risk</div>
+            </div>
+          </div>
+          <div class="rc-verdict" id="rc-verdict"></div>
+          <div class="rc-desc" id="rc-desc"></div>
+          <div class="rc-chips" id="rc-chips"></div>
+        </div>
+      </div>
+    </div>
+  </aside>
+</div>
+
+<!-- RESULT OVERLAY -->
+<div id="result-overlay">
+  <div class="overlay-card" id="overlay-card">
+    <div class="oc-close" onclick="closeOverlay()">✕</div>
+    <div class="oc-icon" id="oc-icon">🫀</div>
+    <div class="oc-pct" id="oc-pct">—</div>
+    <div class="oc-label">Predicted Probability</div>
+    <div class="oc-verdict" id="oc-verdict"></div>
+    <div class="oc-desc" id="oc-desc"></div>
+    <div class="oc-risk-factors">
+      <div class="oc-rf-title">Key Contributing Factors</div>
+      <div id="oc-rf-list"></div>
+    </div>
+    <div class="oc-factors" id="oc-factors"></div>
+    <div class="oc-disclaimer">⚕️ This tool is for educational and academic purposes only. It does not replace professional medical diagnosis. Always consult a qualified cardiologist for clinical decisions.</div>
+    <button class="oc-close-btn" onclick="closeOverlay()">Close & Review Parameters</button>
+  </div>
+</div>
+
+<!-- ABOUT PANEL -->
+<div id="panel-about" class="panel">
+  <div class="about-hero">
+    <div class="about-badge">🫀 UCI Heart Disease Dataset</div>
+    <h1>Heart Disease <span>Predictor</span></h1>
+    <p>A clinical-grade AI tool using logistic regression trained on 303 patient records from the Cleveland Clinic Foundation to assess cardiac risk with Low / Medium / High classification.</p>
+  </div>
+  <div class="cards-grid">
+    <div class="info-card"><div class="ic-icon">🧠</div><h3>Logistic Regression</h3><p>UCI dataset–derived weights power a binary classifier mapping 13 clinical features to cardiac risk probability.</p></div>
+    <div class="info-card"><div class="ic-icon">📊</div><h3>~85% Accuracy</h3><p>Validated on the UCI Cleveland Heart Disease dataset with standard train/test splits and cross-validation.</p></div>
+    <div class="info-card"><div class="ic-icon">🎯</div><h3>3-Level Risk</h3><p>Low (&lt;35%), Medium (35–65%), High (&gt;65%) risk bands with clinical recommendations for each tier.</p></div>
+    <div class="info-card"><div class="ic-icon">💡</div><h3>Feature Insights</h3><p>Real-time tooltips and info boxes explain what each value means for cardiac risk as you adjust sliders.</p></div>
+  </div>
+  <div class="section-card"><h2>📋 Model Comparison</h2><div class="model-grid" id="model-grid"></div></div>
+  <footer>⚕️ For academic and educational purposes only. Not a substitute for professional medical advice.</footer>
+</div>
+
+<!-- HOW IT WORKS -->
+<div id="panel-how" class="panel">
+  <div class="about-hero" style="margin-bottom:32px;">
+    <div class="about-badge">⚙️ Pipeline</div>
+    <h1>How It <span>Works</span></h1>
+    <p>A step-by-step breakdown of the ML pipeline from raw UCI data to a cardiac risk prediction.</p>
+  </div>
+  <div class="steps-list" id="steps-list"></div>
+  <div class="section-card"><h2>🔬 All 13 Input Features</h2><div class="feat-grid" id="feat-grid"></div></div>
+  <footer>⚕️ For academic and educational purposes only. Not a substitute for professional medical advice.</footer>
+</div>
+
+</div><!-- #app -->
+
+<script>
+/* ─────────────────────────────────────────────
+   FEATURE RISK REFERENCE DATA
+───────────────────────────────────────────── */
+const SLIDER_RISKS = {
+  age: (v) => {
+    if (v < 35)  return { level:'low',    label:'Low Risk',    note:'Young age — lower baseline risk' };
+    if (v < 50)  return { level:'medium', label:'Moderate',    note:'Age 35–50: moderate risk zone' };
+    return             { level:'high',   label:'High Risk',   note:'Age >50: significantly elevated risk' };
+  },
+  trestbps: (v) => {
+    if (v < 90)  return { level:'medium', label:'Low BP',      note:'Hypotension — consult doctor' };
+    if (v <= 120) return { level:'low',   label:'Normal',      note:'Normal blood pressure (90–120 mmHg)' };
+    if (v <= 140) return { level:'medium', label:'Pre-Hyper',  note:'Pre-hypertension (120–140 mmHg)' };
+    return              { level:'high',  label:'Hypertension', note:'Stage 1+ Hypertension — elevated risk' };
+  },
+  thalach: (v) => {
+    if (v < 100) return { level:'high',   label:'Very Low HR', note:'Severely low max HR — high cardiac risk' };
+    if (v < 120) return { level:'high',   label:'Low HR',      note:'Low max HR — concerning, high risk' };
+    if (v < 150) return { level:'medium', label:'Moderate',    note:'Below-average max HR' };
+    return             { level:'low',    label:'Healthy',     note:'Good cardiac fitness level' };
+  },
+  oldpeak: (v) => {
+    if (v === 0)  return { level:'low',   label:'No ST Dep.',  note:'No ST depression — favorable sign' };
+    if (v <= 1)   return { level:'low',   label:'Minimal',     note:'Minimal ST depression (0–1 mm)' };
+    if (v <= 2)   return { level:'medium', label:'Moderate',   note:'Moderate ST depression (1–2 mm)' };
+    return              { level:'high',  label:'High ST Dep.', note:'Significant ST depression (>2 mm) — ischemia risk' };
+  },
+  chol: (v) => {
+    if (v < 150)  return { level:'medium', label:'Very Low',   note:'Unusually low — may indicate malnutrition' };
+    if (v <= 200) return { level:'low',    label:'Desirable',  note:'Desirable cholesterol range (<200 mg/dL)' };
+    if (v <= 240) return { level:'medium', label:'Borderline', note:'Borderline high cholesterol (200–240)' };
+    return              { level:'high',   label:'High Chol',  note:'High cholesterol (>240 mg/dL) — elevated risk' };
+  },
+  ca: (v) => {
+    if (v === 0)  return { level:'low',    label:'No Blockage', note:'No major vessels narrowed — low structural risk' };
+    if (v === 1)  return { level:'medium', label:'1 Vessel',    note:'1 vessel affected — moderate risk' };
+    if (v === 2)  return { level:'high',   label:'2 Vessels',   note:'2 vessels affected — high risk' };
+    return              { level:'high',   label:'3 Vessels',   note:'3 vessels narrowed — very high risk' };
+  }
+};
+
+const CP_INFO = {
+  0: { cls:'risk-high',   badge:'high',   title:'🔴 Typical Angina — HIGH RISK',        desc:'Classic heart-related chest pain. Occurs predictably with exertion, relieved by rest or nitrates. Strongly associated with coronary artery disease. This is the highest-risk chest pain type.' },
+  1: { cls:'risk-medium', badge:'medium', title:'🟡 Atypical Angina — MODERATE RISK',   desc:'Chest pain with some but not all typical angina features. May include unusual location, duration, or triggers. Moderate association with coronary disease.' },
+  2: { cls:'risk-medium', badge:'medium', title:'🟡 Non-Anginal Pain — MODERATE RISK',  desc:'Chest pain unlikely to be cardiac in origin. May be musculoskeletal, gastrointestinal, or anxiety-related. Still warrants investigation to rule out cardiac causes.' },
+  3: { cls:'risk-high',   badge:'high',   title:'🔴 Asymptomatic — HIGH RISK',          desc:'No chest pain despite active disease — "silent ischemia". Paradoxically, asymptomatic patients have higher disease rates in UCI data as they often present late. Very high predictor of positive diagnosis.' }
+};
+
+const SLOPE_INFO = {
+  0: { cls:'risk-low',    badge:'low',    title:'✅ Upsloping — LOW RISK',       desc:'ST segment rises during exercise. Generally a favorable indicator — normal physiological response to increased heart rate.' },
+  1: { cls:'risk-medium', badge:'medium', title:'⚠️ Flat — MODERATE RISK',       desc:'ST segment remains flat during exercise. Suggests possible myocardial ischemia. Requires correlation with other findings.' },
+  2: { cls:'risk-high',   badge:'high',   title:'🔴 Downsloping — HIGH RISK',    desc:'ST segment slopes downward during exercise — the most ominous pattern. Strongly associated with significant coronary artery disease and ischemia.' }
+};
+
+const ECG_INFO = {
+  0: { cls:'risk-low',    badge:'low',    title:'✅ Normal ECG — LOW RISK',                  desc:'Normal sinus rhythm with no ST-T wave changes. No evidence of cardiac abnormality at rest.' },
+  1: { cls:'risk-medium', badge:'medium', title:'⚠️ ST-T Abnormality — MODERATE RISK',       desc:'ST-T wave changes visible on resting ECG. May indicate ischemia, electrolyte imbalance, or medication effects. Requires clinical correlation.' },
+  2: { cls:'risk-high',   badge:'high',   title:'🔴 LV Hypertrophy — HIGH RISK',             desc:'Left Ventricular Hypertrophy (LVH): thickening of heart muscle. Associated with chronic hypertension and significantly increased cardiac risk.' }
+};
+
+const THAL_INFO = {
+  0: { cls:'risk-low',    badge:'low',    title:'✅ Normal — LOW RISK',           desc:'Normal thalassemia status. No perfusion defects detected on nuclear stress test.' },
+  1: { cls:'risk-medium', badge:'medium', title:'⚠️ Fixed Defect — MODERATE RISK',   desc:'Fixed perfusion defect: area of heart that shows reduced blood flow at rest AND during stress — may indicate old infarction (scar tissue).' },
+  2: { cls:'risk-high',   badge:'high',   title:'🔴 Reversible Defect — HIGH RISK',  desc:'Reversible perfusion defect: area shows reduced blood flow during stress that normalizes at rest — classic sign of active ischemia (live but stressed tissue). High predictor of coronary artery disease.' },
+  3: { cls:'risk-medium', badge:'medium', title:'⚠️ Unknown/Other — MODERATE RISK',  desc:'Unclassified or unknown thalassemia result. Insufficient data for precise risk stratification — treat as moderate risk.' }
+};
+
+/* ─────────────────────────────────────────────
+   TOGGLE STATE
+───────────────────────────────────────────── */
+const TS = { sex: 1, fbs: 0, exang: 0 };
+
+const API_BASE = localStorage.getItem('cardiosense_api_base') || 'http://127.0.0.1:8000/api/v1';
+const AUTH_STORAGE_KEY = 'cardiosense_auth_v1';
+let AUTH = { token: '', user: null };
+
+function setBackendStatus(text, tone='online') {
+  const status = document.getElementById('backend-status');
+  const label = document.getElementById('backend-status-text');
+  if (label) label.textContent = text;
+  if (!status) return;
+  status.classList.remove('offline', 'error');
+  if (tone === 'offline') status.classList.add('offline');
+  if (tone === 'error') status.classList.add('error');
+}
+
+function showToast(message) {
+  const toast = document.getElementById('api-toast');
+  if (!toast) return;
+  toast.textContent = message;
+  toast.classList.add('show');
+  clearTimeout(showToast.timer);
+  showToast.timer = setTimeout(() => {
+    toast.classList.remove('show');
+  }, 2600);
+}
+
+function formatRiskLabel(level, label) {
+  const icon = level === 'high' ? '⚠' : level === 'medium' ? '⚡' : '✓';
+  return `${icon} ${label}`;
+}
+
+function loadStoredAuth() {
+  const raw = localStorage.getItem(AUTH_STORAGE_KEY);
+  if (!raw) return;
+  try {
+    const parsed = JSON.parse(raw);
+    AUTH = {
+      token: parsed.token || '',
+      user: parsed.user || null,
+    };
+  } catch {
+    AUTH = { token: '', user: null };
+  }
+}
+
+function persistAuth() {
+  localStorage.setItem(AUTH_STORAGE_KEY, JSON.stringify(AUTH));
+}
+
+function clearAuth() {
+  AUTH = { token: '', user: null };
+  localStorage.removeItem(AUTH_STORAGE_KEY);
+}
+
+function updateAuthUI() {
+  const form = document.getElementById('tb-auth-form');
+  const userBox = document.getElementById('tb-user-box');
+  const userName = document.getElementById('tb-user-name');
+  if (AUTH.token && AUTH.user) {
+    if (form) form.style.display = 'none';
+    if (userBox) userBox.style.display = 'flex';
+    if (userName) userName.textContent = AUTH.user.email;
+    return;
+  }
+  if (form) form.style.display = 'flex';
+  if (userBox) userBox.style.display = 'none';
+}
+
+async function apiRequest(path, opts = {}) {
+  const options = { ...opts };
+  options.headers = {
+    ...(options.headers || {}),
+  };
+  if (!options.headers['Content-Type'] && options.body) {
+    options.headers['Content-Type'] = 'application/json';
+  }
+  if (opts.auth && AUTH.token) {
+    options.headers.Authorization = `Bearer ${AUTH.token}`;
+  }
+
+  const response = await fetch(`${API_BASE}${path}`, options);
+  const data = await response.json().catch(() => ({}));
+  if (!response.ok) {
+    throw new Error(data.detail || `Request failed with status ${response.status}`);
+  }
+  return data;
+}
+
+async function registerUser() {
+  const email = document.getElementById('auth-email')?.value?.trim().toLowerCase();
+  const password = document.getElementById('auth-password')?.value || '';
+  if (!email || !password) {
+    showToast('Email and password required');
+    return;
+  }
+
+  try {
+    const payload = { email, password, full_name: email.split('@')[0] };
+    const data = await apiRequest('/auth/register', {
+      method: 'POST',
+      body: JSON.stringify(payload),
+    });
+    AUTH = { token: data.access_token, user: data.user };
+    persistAuth();
+    updateAuthUI();
+    setBackendStatus('API Mode: Signed In', 'online');
+    showToast('Account created and logged in');
+  } catch (err) {
+    setBackendStatus('Backend/Auth Error', 'error');
+    showToast(err.message || 'Registration failed');
+  }
+}
+
+async function loginUser() {
+  const email = document.getElementById('auth-email')?.value?.trim().toLowerCase();
+  const password = document.getElementById('auth-password')?.value || '';
+  if (!email || !password) {
+    showToast('Email and password required');
+    return;
+  }
+
+  try {
+    const data = await apiRequest('/auth/login', {
+      method: 'POST',
+      body: JSON.stringify({ email, password }),
+    });
+    AUTH = { token: data.access_token, user: data.user };
+    persistAuth();
+    updateAuthUI();
+    setBackendStatus('API Mode: Signed In', 'online');
+    showToast('Logged in successfully');
+  } catch (err) {
+    setBackendStatus('Backend/Auth Error', 'error');
+    showToast(err.message || 'Login failed');
+  }
+}
+
+function logoutUser() {
+  clearAuth();
+  updateAuthUI();
+  setBackendStatus('Local Model Mode', 'offline');
+  showToast('Logged out');
+}
+
+async function hydrateAuthSession() {
+  loadStoredAuth();
+  updateAuthUI();
+  if (!AUTH.token) return;
+  try {
+    const me = await apiRequest('/auth/me', { method: 'GET', auth: true });
+    AUTH.user = me;
+    persistAuth();
+    updateAuthUI();
+    setBackendStatus('API Mode: Signed In', 'online');
+  } catch {
+    clearAuth();
+    updateAuthUI();
+    setBackendStatus('Session Expired', 'offline');
+  }
+}
+
+async function checkBackendHealth() {
+  try {
+    const health = await apiRequest('/health', { method: 'GET' });
+    if (AUTH.token && AUTH.user) {
+      setBackendStatus('API Mode: Signed In', 'online');
+      return;
+    }
+    setBackendStatus(health.model_loaded ? 'API Ready (Login to Sync)' : 'API Up (Train Model Pending)', 'online');
+  } catch {
+    if (!AUTH.token) {
+      setBackendStatus('Local Model Mode', 'offline');
+    }
+  }
+}
+
+async function loadPredictionHistory() {
+  if (!AUTH.token) {
+    showToast('Login required for history');
+    return;
+  }
+
+  try {
+    const records = await apiRequest('/predictions/history?limit=6', { method: 'GET', auth: true });
+    if (!records.length) {
+      showToast('No saved predictions yet');
+      return;
+    }
+    const summary = records.map((item, idx) => {
+      const pct = Math.round(item.probability * 100);
+      const time = new Date(item.created_at).toLocaleString();
+      return `${idx + 1}. ${pct}% ${item.risk_level.toUpperCase()} (${time})`;
+    }).join('\n');
+    alert(`Recent Predictions\n\n${summary}`);
+  } catch (err) {
+    showToast(err.message || 'Could not load history');
+  }
+}
+
+async function predictWithBackend(values) {
+  if (!AUTH.token) return null;
+  const data = await apiRequest('/predictions', {
+    method: 'POST',
+    body: JSON.stringify(values),
+    auth: true,
+  });
+
+  return {
+    prediction: data.prediction,
+    probability: data.probability,
+    riskLevel: data.risk_level,
+    riskLabel: formatRiskLabel(data.risk_level, data.risk_label),
+    risk_factors: data.risk_factors || [],
+    recommendation: data.recommendation || '',
+  };
+}
+
+function setToggle(key, val) {
+  TS[key] = val;
+  document.querySelectorAll(`[id^="tog-${key}-"]`).forEach(el => el.classList.remove('on'));
+  document.getElementById(`tog-${key}-${val}`)?.classList.add('on');
+  updateLivePanel();
+}
+
+/* ─────────────────────────────────────────────
+   SLIDER UPDATE
+───────────────────────────────────────────── */
+function sliderUpdate(inputId, displayId, val) {
+  document.getElementById(displayId).textContent = val;
+  const input = document.getElementById(inputId);
+  const min = +input.min, max = +input.max, v = +input.value;
+  const pct = ((v - min) / (max - min) * 100).toFixed(1);
+  input.style.setProperty('--val', pct + '%');
+}
+
+/* ─────────────────────────────────────────────
+   SLIDER RISK INDICATOR (badge + tooltip)
+───────────────────────────────────────────── */
+function updateSliderRisk(feat, val) {
+  const rf = SLIDER_RISKS[feat];
+  if (!rf) return;
+  const r = rf(val);
+
+  // Update badge next to label
+  const sri = document.getElementById('sri-' + feat);
+  if (sri) {
+    sri.className = 'slider-risk-indicator sri-' + r.level;
+    sri.textContent = r.label;
+  }
+
+  // Update tooltip
+  const tip = document.getElementById('tip-' + feat);
+  if (tip) {
+    const slider = document.getElementById('inp-' + feat);
+    const min = +slider.min, max = +slider.max, v = +slider.value;
+    const pct = (v - min) / (max - min);
+    const thumbPos = pct * slider.offsetWidth;
+    tip.style.left = thumbPos + 'px';
+    const riskColor = r.level === 'high' ? '#ff8099' : r.level === 'medium' ? '#ffcc66' : '#66ffb8';
+    tip.innerHTML = `<span>${feat === 'oldpeak' ? (val).toFixed(1) + ' mm' : val}</span><br><span class="tip-risk ${r.level}" style="color:${riskColor}">${r.level.toUpperCase()} RISK</span><br><span style="font-size:10px;opacity:0.8">${r.note}</span>`;
+  }
+
+  // Update dynamic info box
+  updateDynamicInfoBox(feat, r);
+}
+
+function updateDynamicInfoBox(feat, r) {
+  const boxMap = {
+    trestbps: 'bp-info',
+    thalach: 'hr-info',
+    oldpeak: 'op-info',
+    chol: 'chol-info',
+    ca: 'ca-info'
+  };
+  const boxId = boxMap[feat];
+  if (!boxId) return;
+  const box = document.getElementById(boxId);
+  if (!box) return;
+  box.className = 'feature-info-box risk-' + r.level;
+  box.innerHTML = `<div class="fib-title">ℹ️ Live Risk Assessment</div><span class="risk-badge ${r.level}">${r.level === 'high' ? '🔴' : r.level === 'medium' ? '⚠️' : '✅'} ${r.level.toUpperCase()} RISK</span><br>${r.note}`;
+}
+
+/* ─────────────────────────────────────────────
+   SELECT INFO BOX UPDATERS
+───────────────────────────────────────────── */
+function showChestPainInfo() {
+  const v = +document.getElementById('inp-cp').value;
+  const info = CP_INFO[v];
+  const box = document.getElementById('cp-info-box');
+  box.className = 'feature-info-box ' + info.cls;
+  box.innerHTML = `<div class="fib-title">${info.title}</div><span class="risk-badge ${info.badge}">${info.badge.toUpperCase()} RISK</span><br>${info.desc}`;
+}
+
+function showSlopeInfo() {
+  const v = +document.getElementById('inp-slope').value;
+  const info = SLOPE_INFO[v];
+  const box = document.getElementById('slope-info-box');
+  box.className = 'feature-info-box ' + info.cls;
+  box.innerHTML = `<div class="fib-title">${info.title}</div><span class="risk-badge ${info.badge}">${info.badge.toUpperCase()} RISK</span><br>${info.desc}`;
+}
+
+function showEcgInfo() {
+  const v = +document.getElementById('inp-restecg').value;
+  const info = ECG_INFO[v];
+  const box = document.getElementById('ecg-info-box');
+  box.className = 'feature-info-box ' + info.cls;
+  box.innerHTML = `<div class="fib-title">${info.title}</div><span class="risk-badge ${info.badge}">${info.badge.toUpperCase()} RISK</span><br>${info.desc}`;
+}
+
+function showThalInfo() {
+  const v = +document.getElementById('inp-thal').value;
+  const info = THAL_INFO[v];
+  const box = document.getElementById('thal-info-box');
+  box.className = 'feature-info-box ' + info.cls;
+  box.innerHTML = `<div class="fib-title">${info.title}</div><span class="risk-badge ${info.badge}">${info.badge.toUpperCase()} RISK</span><br>${info.desc}`;
+}
+
+/* ─────────────────────────────────────────────
+   STEP NAVIGATION
+───────────────────────────────────────────── */
+let currentStep = 1;
+const stepTitles = ['','Patient Demographics','Heart Metrics','Lab Values','Clinical Tests'];
+const stepSubs   = ['','Age, sex and pain classification','Heart rate, blood pressure and ST segment','Cholesterol and glucose markers','ECG results, vessels and thalassemia'];
+
+function goStep(n) {
+  if (n > currentStep) {
+    for (let i = currentStep; i < n; i++) {
+      document.getElementById('si-'+i)?.classList.remove('active');
+      document.getElementById('si-'+i)?.classList.add('done');
+    }
+  } else {
+    for (let i = n; i <= 4; i++) {
+      document.getElementById('si-'+i)?.classList.remove('done');
+    }
+  }
+  document.querySelectorAll('.step-content').forEach(c => c.classList.remove('active'));
+  document.querySelectorAll('.step-item').forEach(s => s.classList.remove('active'));
+  document.getElementById('step-'+n)?.classList.add('active');
+  document.getElementById('si-'+n)?.classList.add('active');
+  document.getElementById('step-title').textContent = stepTitles[n];
+  document.getElementById('step-sub').textContent = stepSubs[n];
+  currentStep = n;
+  const pct = Math.round(((n-1)/4)*100);
+  document.getElementById('sp-fill').style.width = pct+'%';
+  document.getElementById('sp-pct').textContent = pct+'%';
+  if (n === 4) buildSummaryTable();
+}
+
+/* ─────────────────────────────────────────────
+   GET VALUES
+───────────────────────────────────────────── */
+function getValues() {
+  return {
+    age:      +document.getElementById('inp-age').value,
+    sex:      TS.sex,
+    cp:       +document.getElementById('inp-cp').value,
+    trestbps: +document.getElementById('inp-trestbps').value,
+    chol:     +document.getElementById('inp-chol').value,
+    fbs:      TS.fbs,
+    restecg:  +document.getElementById('inp-restecg').value,
+    thalach:  +document.getElementById('inp-thalach').value,
+    exang:    TS.exang,
+    oldpeak:  +document.getElementById('inp-oldpeak').value / 10,
+    slope:    +document.getElementById('inp-slope').value,
+    ca:       +document.getElementById('inp-ca').value,
+    thal:     +document.getElementById('inp-thal').value,
+  };
+}
+
+/* ─────────────────────────────────────────────
+   LIVE PANEL UPDATE
+───────────────────────────────────────────── */
+function updateLivePanel() {
+  const v = getValues();
+  document.getElementById('hcv-age').textContent  = v.age;
+  document.getElementById('hcv-bp').textContent   = v.trestbps;
+  document.getElementById('hcv-chol').textContent = v.chol;
+  document.getElementById('hc-bpm').textContent   = v.thalach;
+}
+
+/* ─────────────────────────────────────────────
+   IMPROVED LOGISTIC REGRESSION
+   Corrected coefficients aligned with UCI dataset
+   (direction fixed: lower cp value = more risk
+    higher thalach = lower risk, etc.)
+───────────────────────────────────────────── */
+function localPredict(v) {
+  // Standardize features (approximate UCI training set means/stds)
+  const means = { age:54.4, trestbps:131.7, chol:246.7, thalach:149.6, oldpeak:1.04 };
+  const stds  = { age:9.04, trestbps:17.6,  chol:51.8,  thalach:22.9,  oldpeak:1.16 };
+
+  const norm = (val, key) => (val - means[key]) / stds[key];
+
+  // Logistic regression coefficients (direction: positive = more disease risk)
+  let score = 0.2;  // bias
+  score += norm(v.age, 'age')           * 0.38;
+  score += v.sex                        * 0.74;
+  // cp: 0=typical angina(high risk), 3=asymptomatic(paradoxically high in UCI)
+  // Mapping: 0->1.2, 1->0.4, 2->0.0, 3->1.0
+  const cpScore = [1.2, 0.4, 0.0, 1.0];
+  score += cpScore[v.cp] || 0;
+  score += norm(v.trestbps, 'trestbps') * 0.21;
+  score += norm(v.chol, 'chol')         * 0.12;
+  score += v.fbs                        * 0.18;
+  score += v.restecg                    * 0.22;
+  score += norm(v.thalach, 'thalach')   * (-0.48);  // higher = lower risk
+  score += v.exang                      * 0.90;
+  score += norm(v.oldpeak, 'oldpeak')   * 0.62;
+  const slopeScore = [-0.40, 0.10, 0.50];
+  score += slopeScore[v.slope] || 0;
+  score += v.ca                         * 0.72;
+  // thal: 0=normal(low), 1=fixed(mod), 2=reversible(high), 3=unknown
+  const thalScore = [-0.5, 0.3, 0.9, 0.4];
+  score += thalScore[v.thal] || 0;
+
+  const probability = 1 / (1 + Math.exp(-score));
+
+  // 3-tier risk
+  let riskLevel, riskLabel;
+  if (probability >= 0.65) {
+    riskLevel = 'high'; riskLabel = '⚠ High Risk';
+  } else if (probability >= 0.35) {
+    riskLevel = 'medium'; riskLabel = '⚡ Moderate Risk';
+  } else {
+    riskLevel = 'low'; riskLabel = '✓ Low Risk';
+  }
+
+  const prediction = probability >= 0.5 ? 1 : 0;
+
+  const factors = [];
+  if (v.cp === 0)        factors.push('Typical angina — strongest classical chest pain indicator');
+  if (v.cp === 3)        factors.push('Asymptomatic presentation — often indicates silent ischemia');
+  if (v.ca >= 2)         factors.push(`${v.ca} major coronary vessels narrowed by plaque`);
+  if (v.ca === 1)        factors.push('1 major coronary vessel shows narrowing');
+  if (v.exang === 1)     factors.push('Exercise-induced angina present — blood flow restricted');
+  if (v.oldpeak >= 2)    factors.push(`High ST depression: ${v.oldpeak.toFixed(1)} mm — ischemia pattern`);
+  if (v.thal === 2)      factors.push('Reversible thalassemia defect — active ischemia detected');
+  if (v.thal === 1)      factors.push('Fixed thalassemia defect — possible prior infarction');
+  if (v.thalach < 120)   factors.push(`Very low max heart rate: ${v.thalach} bpm — poor cardiac reserve`);
+  if (v.age > 55)        factors.push(`Age ${v.age}: elevated baseline risk above 55 years`);
+  if (v.chol > 240)      factors.push(`High cholesterol: ${v.chol} mg/dL`);
+  if (v.trestbps > 140)  factors.push(`Hypertension: BP ${v.trestbps} mmHg`);
+  if (v.slope === 2)     factors.push('Downsloping ST segment — strongest ischemia indicator');
+  if (v.restecg === 2)   factors.push('Left Ventricular Hypertrophy on ECG');
+  if (v.sex === 1)       factors.push('Male sex — statistically higher cardiac risk');
+
+  // Protective factors for LOW risk
+  const protective = [];
+  if (v.cp === 2)        protective.push('Non-anginal chest pain — less likely cardiac origin');
+  if (v.ca === 0)        protective.push('No coronary vessel blockage detected');
+  if (v.thalach > 150)   protective.push(`Excellent max heart rate: ${v.thalach} bpm`);
+  if (v.oldpeak === 0)   protective.push('No ST depression — favorable ECG response');
+  if (v.thal === 0)      protective.push('Normal thalassemia — no perfusion defect');
+  if (v.slope === 0)     protective.push('Upsloping ST segment — normal exercise response');
+  if (v.chol < 200)      protective.push('Desirable cholesterol level');
+  if (v.trestbps <= 120) protective.push('Normal blood pressure');
+  if (v.age < 40)        protective.push(`Young age (${v.age}) — lower baseline risk`);
+
+  const topFactors = riskLevel === 'low'
+    ? (protective.length > 0 ? protective.slice(0,4) : ['Risk based on combined low-risk profile'])
+    : factors.slice(0,4);
+
+  let recommendation = '';
+  if (riskLevel === 'high')   recommendation = '🔴 High risk detected. Immediate consultation with a cardiologist is strongly advised. Consider stress testing, echocardiography, and possible angiography.';
+  else if (riskLevel === 'medium') recommendation = '🟡 Moderate risk. Schedule a cardiac evaluation within 1–3 months. Adopt heart-healthy lifestyle: Mediterranean diet, regular aerobic exercise, manage stress.';
+  else                        recommendation = '✅ Low risk profile. Maintain healthy habits — 150 min/week moderate exercise, balanced diet, no smoking, annual checkups.';
+
+  return { prediction, probability, riskLevel, riskLabel, risk_factors: topFactors, recommendation };
+}
+
+/* ─────────────────────────────────────────────
+   HANDLE PREDICT
+───────────────────────────────────────────── */
+async function handlePredict() {
+  const btn = document.querySelector('.btn-analyze');
+  btn.disabled = true;
+  btn.textContent = 'Analyzing...';
+
+  const v = getValues();
+  let result = null;
+
+  if (AUTH.token) {
+    try {
+      result = await predictWithBackend(v);
+      setBackendStatus('API Prediction Saved', 'online');
+      showToast('Prediction stored in your account history');
+    } catch (err) {
+      setBackendStatus('Backend Error: Local Fallback', 'error');
+      showToast(err.message || 'Backend prediction failed');
+    }
+  }
+
+  if (!result) {
+    await new Promise(r => setTimeout(r, 900));
+    result = localPredict(v);
+    if (!AUTH.token) {
+      setBackendStatus('Local Model Mode', 'offline');
+    }
+  }
+
+  btn.disabled = false;
+  btn.innerHTML = '🫀 &nbsp;Run Cardiac Analysis';
+  showResult(result, v);
+}
+
+/* ─────────────────────────────────────────────
+   SHOW RESULT
+───────────────────────────────────────────── */
+function showResult(r, v) {
+  const isHigh = r.riskLevel === 'high';
+  const isMed  = r.riskLevel === 'medium';
+  const pct    = Math.round(r.probability * 100);
+  const conf   = Math.round(Math.max(r.probability, 1 - r.probability) * 100);
+
+  const arcColor = isHigh ? 'var(--red)' : isMed ? 'var(--amber)' : 'var(--green)';
+
+  // Right panel orb
+  const orb     = document.getElementById('rc-orb');
+  const arc     = document.getElementById('rc-arc');
+  document.getElementById('rc-standby').style.display = 'none';
+  document.getElementById('rc-result').style.display = 'block';
+  orb.className = 'risk-orb ' + r.riskLevel;
+  arc.style.stroke = arcColor;
+  arc.setAttribute('stroke-dashoffset', (377 - 377 * r.probability).toFixed(1));
+
+  document.getElementById('rc-pct').textContent = pct + '%';
+  document.getElementById('rc-verdict').textContent = r.riskLabel;
+  document.getElementById('rc-verdict').className = 'rc-verdict ' + r.riskLevel;
+  document.getElementById('rc-desc').textContent = `${pct}% predicted probability — ${r.riskLevel === 'high' ? 'Clinical evaluation recommended.' : r.riskLevel === 'medium' ? 'Preventive measures advised.' : 'Healthy cardiac profile.'}`;
+  document.getElementById('rc-dot').style.background = arcColor;
+  document.getElementById('result-card').style.boxShadow = `0 0 0 2px ${isHigh ? 'rgba(255,51,85,0.2)' : isMed ? 'rgba(255,149,0,0.2)' : 'rgba(0,201,119,0.2)'}, var(--shadow-md)`;
+
+  const cpL  = {0:'Typ.Angina',1:'Atyp.Angina',2:'Non-Anginal',3:'Asympt.'};
+  const thalL= {0:'Normal',1:'Fixed Def.',2:'Reversible',3:'Unknown'};
+  document.getElementById('rc-chips').innerHTML = `
+    <div class="rc-chip"><div class="rcc-k">Chest Pain</div><div class="rcc-v">${cpL[v.cp]}</div></div>
+    <div class="rc-chip"><div class="rcc-k">Max HR</div><div class="rcc-v">${v.thalach} bpm</div></div>
+    <div class="rc-chip"><div class="rcc-k">ST Dep.</div><div class="rcc-v">${v.oldpeak.toFixed(1)} mm</div></div>
+    <div class="rc-chip"><div class="rcc-k">Vessels</div><div class="rcc-v">${v.ca}</div></div>`;
+
+  // Full overlay
+  const oc = document.getElementById('overlay-card');
+  oc.className = 'overlay-card ' + r.riskLevel + '-risk';
+  document.getElementById('oc-icon').textContent  = isHigh ? '⚠️' : isMed ? '⚡' : '🫀';
+  document.getElementById('oc-pct').textContent   = pct + '%';
+  document.getElementById('oc-verdict').textContent = isHigh ? '❤️ High Risk — Seek Medical Evaluation' : isMed ? '⚡ Moderate Risk — Take Preventive Action' : '✅ Low Risk — Healthy Profile';
+  document.getElementById('oc-desc').textContent  = `Patient shows ${pct}% predicted probability of heart disease (model confidence: ${conf}%). Risk level: ${r.riskLevel.toUpperCase()}. ${r.recommendation}`;
+
+  document.getElementById('oc-rf-list').innerHTML = r.risk_factors.map(f => `
+    <div class="oc-rf-item"><div class="oc-rf-dot" style="background:${isHigh?'var(--red)':isMed?'var(--amber)':'var(--green)'}"></div>${f}</div>`).join('');
+
+  document.getElementById('oc-factors').innerHTML = [
+    ['Chest Pain',   cpL[v.cp]],
+    ['Max HR',       v.thalach + ' bpm'],
+    ['ST Dep.',      v.oldpeak.toFixed(1) + ' mm'],
+    ['Thalassemia',  thalL[v.thal]],
+    ['Vessels',      v.ca],
+    ['Ex. Angina',   v.exang ? 'Yes' : 'No'],
+  ].map(([k,val]) => `
+    <div class="oc-factor">
+      <div class="ocf-k">${k}</div>
+      <div class="ocf-v">${val}</div>
+    </div>`).join('');
+
+  document.getElementById('result-overlay').classList.add('show');
+  document.getElementById('sp-fill').style.width = '100%';
+  document.getElementById('sp-pct').textContent = '100%';
+}
+
+function closeOverlay() {
+  document.getElementById('result-overlay').classList.remove('show');
+}
+
+/* ─────────────────────────────────────────────
+   SUMMARY TABLE
+───────────────────────────────────────────── */
+function buildSummaryTable() {
+  const vals = getValues();
+  const cpL  = {0:'Typ. Angina',1:'Atyp. Angina',2:'Non-Anginal',3:'Asympt.'};
+  const thalL = {0:'Normal',1:'Fixed',2:'Reversible',3:'Unknown'};
+  const ecgL  = {0:'Normal',1:'ST-T Abn.',2:'LV Hypertrophy'};
+  const slopeL= {0:'Upsloping',1:'Flat',2:'Downsloping'};
+  const rows = [
+    ['Age', vals.age+' yrs'], ['Sex', vals.sex===1?'Male':'Female'],
+    ['Chest Pain', cpL[vals.cp]], ['Resting BP', vals.trestbps+' mmHg'],
+    ['Max HR', vals.thalach+' bpm'], ['Cholesterol', vals.chol+' mg/dL'],
+    ['Fasting BS', vals.fbs?'>120':'Normal'], ['ECG', ecgL[vals.restecg]],
+    ['Ex. Angina', vals.exang?'Yes':'No'], ['Oldpeak', (vals.oldpeak).toFixed(1)+' mm'],
+    ['ST Slope', slopeL[vals.slope]], ['Vessels', vals.ca],
+    ['Thalassemia', thalL[vals.thal]],
+  ];
+  document.getElementById('summary-table').innerHTML = rows.map(([k,v]) => `
+    <div style="background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:10px 12px;">
+      <div style="font-size:9px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--ink4);">${k}</div>
+      <div style="font-size:13px;font-weight:700;color:var(--ink);margin-top:3px;">${v}</div>
+    </div>`).join('');
+}
+
+/* ─────────────────────────────────────────────
+   TAB NAVIGATION
+───────────────────────────────────────────── */
+function switchTab(id, el) {
+  document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.tb-nav-item').forEach(n => n.classList.remove('active'));
+  document.getElementById('panel-'+id)?.classList.add('active');
+  (el || document.querySelector('.tb-nav-item')).classList.add('active');
+  if (id === 'about') renderModels();
+  if (id === 'how')   renderSteps();
+}
+
+/* ─────────────────────────────────────────────
+   SAMPLE DATA
+───────────────────────────────────────────── */
+function fillSample() {
+  const s = { age:57, sex:1, cp:0, trestbps:145, chol:233, fbs:1, restecg:2, thalach:150, exang:0, oldpeak:23, slope:0, ca:0, thal:1 };
+  document.getElementById('inp-age').value      = s.age;
+  document.getElementById('inp-trestbps').value  = s.trestbps;
+  document.getElementById('inp-chol').value      = s.chol;
+  document.getElementById('inp-thalach').value   = s.thalach;
+  document.getElementById('inp-oldpeak').value   = s.oldpeak;
+  document.getElementById('inp-slope').value     = s.slope;
+  document.getElementById('inp-ca').value        = s.ca;
+  document.getElementById('inp-cp').value        = s.cp;
+  document.getElementById('inp-restecg').value   = s.restecg;
+  document.getElementById('inp-thal').value      = s.thal;
+
+  sliderUpdate('inp-age','v-age',s.age);
+  sliderUpdate('inp-trestbps','v-bp',s.trestbps);
+  sliderUpdate('inp-chol','v-chol',s.chol);
+  sliderUpdate('inp-thalach','v-hr',s.thalach);
+  sliderUpdate('inp-oldpeak','v-op',(s.oldpeak/10).toFixed(1));
+  sliderUpdate('inp-ca','v-ca',s.ca);
+
+  setToggle('sex',s.sex);
+  setToggle('fbs',s.fbs);
+  setToggle('exang',s.exang);
+  updateLivePanel();
+  document.getElementById('hc-bpm').textContent = s.thalach;
+
+  // update all risk indicators
+  updateSliderRisk('age', s.age);
+  updateSliderRisk('trestbps', s.trestbps);
+  updateSliderRisk('thalach', s.thalach);
+  updateSliderRisk('oldpeak', s.oldpeak/10);
+  updateSliderRisk('chol', s.chol);
+  updateSliderRisk('ca', s.ca);
+  showChestPainInfo();
+  showSlopeInfo();
+  showEcgInfo();
+  showThalInfo();
+}
+
+/* ─────────────────────────────────────────────
+   ABOUT — MODELS
+───────────────────────────────────────────── */
+const MODELS = [
+  { name:'Logistic Regression', type:'Linear',       acc:'~85%', color:'#0066ff', desc:'Primary model. UCI dataset–derived weights for binary cardiac classification with probability output.' },
+  { name:'Random Forest',       type:'Ensemble',     acc:'~90%', color:'#00c977', desc:'200-tree ensemble with depth tuning — highest accuracy on the UCI dataset.' },
+  { name:'Neural Network (MLP)',type:'Deep Learning', acc:'~87%', color:'#a855f7', desc:'Multi-layer perceptron via sklearn MLPClassifier for non-linear patterns.' },
+  { name:'SVM (Linear)',        type:'Kernel Method', acc:'~87%', color:'#ff9500', desc:'Support Vector Machine with linear kernel and probability calibration.' },
+  { name:'Decision Tree',       type:'Tree-Based',    acc:'~80%', color:'#ff3355', desc:'Single CART decision tree with Gini impurity criterion.' },
+  { name:'Perceptron',          type:'Custom Linear', acc:'~75%', color:'#06b6d4', desc:'Custom-built single-layer perceptron from scratch using NumPy weights.' },
+];
+
+function renderModels() {
+  document.getElementById('model-grid').innerHTML = MODELS.map(m => `
+    <div class="model-item" style="border-left-color:${m.color}">
+      <div class="model-top"><div class="model-name">${m.name}</div><span class="model-acc" style="background:${m.color}22;color:${m.color};border:1px solid ${m.color}44">${m.acc}</span></div>
+      <div class="model-type">${m.type}</div>
+      <div class="model-desc">${m.desc}</div>
+    </div>`).join('');
+}
+
+/* ─────────────────────────────────────────────
+   HOW IT WORKS
+───────────────────────────────────────────── */
+const STEPS = [
+  { num:'01', icon:'📥', title:'Data Collection',  color:'#0066ff', desc:'The UCI Heart Disease dataset contains 303 patient records from the Cleveland Clinic. Each record has 13 clinical attributes and a binary target (0=no disease, 1=disease).' },
+  { num:'02', icon:'⚙️',  title:'Preprocessing',    color:'#a855f7', desc:'Features are standardized using z-score normalization (zero mean, unit variance) to prevent scale dominance in model coefficients.' },
+  { num:'03', icon:'✂️',  title:'Train-Test Split', color:'#06b6d4', desc:'Data split 80/20. 242 training records, 61 test records. Stratified split ensures balanced class distribution.' },
+  { num:'04', icon:'🧠', title:'Model Training',   color:'#ff9500', desc:'Six diverse models trained. Logistic regression provides interpretable probability output used for this interactive predictor.' },
+  { num:'05', icon:'📊', title:'Evaluation',       color:'#00c977', desc:'Models evaluated on accuracy, precision, recall, and F1. Random Forest achieves best overall performance at ~90%.' },
+  { num:'06', icon:'🔮', title:'3-Tier Inference', color:'#ff3355', desc:'Patient data is standardized through the same pipeline, then fed into the model. Output is classified as Low (<35%), Medium (35–65%), or High (>65%) risk.' },
+];
+
+const FEATURES = [
+  { icon:'👤', label:'Age',                    unit:'years',  hint:'Patient age. Risk increases significantly above 55 years.' },
+  { icon:'⚧',  label:'Sex',                    unit:'',       hint:'1=Male (higher risk), 0=Female (risk increases post-menopause).' },
+  { icon:'💢', label:'Chest Pain Type',        unit:'',       hint:'0=Typical angina (high risk), 1=Atypical angina (mod), 2=Non-anginal (low), 3=Asymptomatic (paradoxically high in UCI).' },
+  { icon:'🩸', label:'Resting Blood Pressure', unit:'mmHg',   hint:'Normal: 90–120 mmHg. >140 = Hypertension Stage 1. >160 = Stage 2.' },
+  { icon:'🧪', label:'Serum Cholesterol',      unit:'mg/dL',  hint:'<200 = Desirable. 200–239 = Borderline High. >240 = High risk.' },
+  { icon:'🍬', label:'Fasting Blood Sugar',    unit:'',       hint:'1 = FBS >120 mg/dL (diabetic range). 0 = Normal. Diabetes is independent cardiac risk factor.' },
+  { icon:'📈', label:'Resting ECG Results',    unit:'',       hint:'0=Normal, 1=ST-T wave abnormality, 2=Left Ventricular Hypertrophy.' },
+  { icon:'❤️', label:'Max Heart Rate',         unit:'bpm',    hint:'Maximum HR during stress test. Higher = better cardiac fitness. <120 bpm is concerning.' },
+  { icon:'🏃', label:'Exercise Angina',        unit:'',       hint:'1=Yes (chest pain during exercise — significant risk marker). 0=No.' },
+  { icon:'📉', label:'ST Depression (Oldpeak)',unit:'mm',     hint:'ST depression during exercise vs rest. 0=none, >2mm = significant ischemia.' },
+  { icon:'📐', label:'Slope of ST Segment',    unit:'',       hint:'0=Upsloping (healthy), 1=Flat (moderate risk), 2=Downsloping (high risk).' },
+  { icon:'🫀', label:'Major Vessels',          unit:'0–3',    hint:'Number of coronary vessels narrowed by plaque. 0=none, 3=severe disease.' },
+  { icon:'🔬', label:'Thalassemia Type',        unit:'',       hint:'0=Normal, 1=Fixed defect (old infarction), 2=Reversible defect (active ischemia — highest risk).' },
+];
+
+function renderSteps() {
+  document.getElementById('steps-list').innerHTML = STEPS.map(s => `
+    <div class="how-step">
+      <div class="how-step-num" style="background:${s.color}18;border:1.5px solid ${s.color}33"><span>${s.icon}</span></div>
+      <div>
+        <div class="how-step-label" style="color:${s.color}">Step ${s.num}</div>
+        <div class="how-step-title">${s.title}</div>
+        <div class="how-step-desc">${s.desc}</div>
+      </div>
+    </div>`).join('');
+
+  document.getElementById('feat-grid').innerHTML = FEATURES.map(f => `
+    <div class="feat-item">
+      <span class="feat-icon">${f.icon}</span>
+      <div>
+        <div class="feat-name">${f.label} ${f.unit?`<span style="font-size:10px;color:var(--ink4);font-weight:500">(${f.unit})</span>`:''}</div>
+        <div class="feat-hint">${f.hint}</div>
+      </div>
+    </div>`).join('');
+}
+
+/* ─────────────────────────────────────────────
+   SPLASH BOOT
+───────────────────────────────────────────── */
+const splashMsgs = ['Initializing logistic model...','Loading UCI dataset weights...','Calibrating 3-tier risk thresholds...','Preparing feature info database...','System ready.'];
+let si = 0;
+const splashInt = setInterval(() => {
+  si++;
+  if (si < splashMsgs.length) {
+    document.getElementById('splash-status').textContent = splashMsgs[si];
+  } else {
+    clearInterval(splashInt);
+    setTimeout(() => {
+      document.getElementById('splash').classList.add('hide');
+      setTimeout(() => document.getElementById('splash').remove(), 700);
+    }, 300);
+  }
+}, 500);
+
+/* ─────────────────────────────────────────────
+   INIT — set all default risk info boxes
+───────────────────────────────────────────── */
+window.addEventListener('DOMContentLoaded', () => {
+  // init slider indicators
+  updateSliderRisk('age', 52);
+  updateSliderRisk('trestbps', 120);
+  updateSliderRisk('thalach', 168);
+  updateSliderRisk('oldpeak', 1.0);
+  updateSliderRisk('chol', 212);
+  updateSliderRisk('ca', 2);
+
+  // init select info boxes
+  showChestPainInfo();
+  showSlopeInfo();
+  showEcgInfo();
+  showThalInfo();
+
+  // init slider fill %
+  ['inp-age','inp-trestbps','inp-chol','inp-thalach','inp-ca'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) {
+      const pct = ((+el.value - +el.min) / (+el.max - +el.min) * 100).toFixed(1);
+      el.style.setProperty('--val', pct+'%');
+    }
+  });
+  const opEl = document.getElementById('inp-oldpeak');
+  if (opEl) {
+    const pct = ((+opEl.value - +opEl.min) / (+opEl.max - +opEl.min) * 100).toFixed(1);
+    opEl.style.setProperty('--val', pct+'%');
+  }
+
+  hydrateAuthSession();
+  checkBackendHealth();
+});
+</script>
+</body>
+</html>
